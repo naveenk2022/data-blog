@@ -12,6 +12,11 @@ pagerSize = 20
 [services.disqus]
 shortname = "yourdiscussshortname"
 
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.parser]
+      wrapStandAloneImageWithinParagraph = false
+
 [markup.highlight]
 style = "github-dark"
 
