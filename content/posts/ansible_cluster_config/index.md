@@ -9,7 +9,7 @@ draft: false
 ShowToc: true
 TocOpen: true
 cover:
-  image: "images/ansible_logo.png"
+  image: "ansible_logo.png"
   alt: "<alt text>"
   caption: "<text>"
   relative: false 
@@ -33,7 +33,12 @@ A basic Ansible environment has the following three components:
 
 -   **Inventory**: This is a list of managed nodes that are organized locally on the **control node**. This lists the IP addresses or the hostnames of the remote systems being managed along with any connection information needed.
 
-{{< figure src="/images/ansible_architecture.png" attr="A flowchart demonstrating the basic architecture of an Ansible environment." align=center target="_blank" >}}
+
+{{< figure 
+    src="ansible_architecture.png" 
+    caption="A flowchart demonstrating the basic architecture of an Ansible environment." 
+    align=center
+>}}
 
 # What does Ansible do?
 
@@ -45,7 +50,10 @@ Ansible uses a declarative language in the YAML format to describe the *desired 
 
 A **Module** is a unit of code that Ansible can run on managed nodes.
 
-{{< figure src="/images/ansible_playbook_structure.png" align=center target="_blank" >}}
+{{< figure 
+    src="ansible_playbook_structure.png" 
+    align=center
+>}}
 
 The key features of Ansible that make it deal to perform automated configuration management of remote systems are as follows:
 
@@ -77,7 +85,11 @@ Let's also assume that there are three cluster nodes, each with private IP addre
 -   YY.Y.Y.3
 -   YY.Y.Y.4
 
-{{< figure src="/images/cluster_config.png" attr="The example use case for Ansible." align=center target="_blank" >}}
+{{< figure 
+    src="cluster_config.png" 
+    caption="The example use case for Ansible." 
+    align=center
+>}}
 
 # The Ansible Dockerfile
 
@@ -154,7 +166,10 @@ However, in our example set-up, it is not possible to directly SSH into the clus
 
 For the sake of making this process easier to understand, follow this flow chart for a break down of the individual steps.
 
-{{< figure src="/images/ssh_flowchart.png" align=center target="_blank" >}}
+{{< figure 
+    src="ssh_flowchart.png" 
+    align=center
+>}}
 
 ## Generating an SSH key
 
