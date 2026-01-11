@@ -1,14 +1,28 @@
 ---
 title: 'SLURM and HPC.'
 date: '2023-06-15'
-categories: ['Computing','HPC','Discussion','Clusters']
+tags: ['Computing','HPC','Discussion','Clusters']
 description: 'An introduction to SLURM in the context of HPC clusters.'
-authors: ["Naveen Kannan"]
+author: ["Naveen Kannan"]
 weight: 10
 draft: false
+ShowToc: true
+TocOpen: true
+cover:
+  image: "https://slurm.schedmd.com/slurm_logo.png"
+  # can also paste direct link from external site
+  # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
+  alt: "<alt text>"
+  caption: "<text>"
+  relative: false # To use relative path for cover image, used in hugo Page-bundles
+  hidden: false
+  hiddenInList: true
+  hiddenInSingle: false
+params:
+  ShowCodeCopyButtons: true
+  ShowReadingTime: true
 ---
 
-![](/images/slurm_logo.png)
 
 # SLURM Workload Manager
 
@@ -28,7 +42,8 @@ SLURM is uniquely suited for use in HPC clusters, due to its ability to facilita
 
 SLURM places jobs/tasks in a queue, and access to resources is allowed based on the processes that are already running at the time, which is very well suited for an HPC cluster, where resources are under heavy usage.
 
-![SLURM architecture. Slurm has a centralized manager, slurmctld, to monitor resources and work. Each compute server (node) has a slurmd daemon, which can be compared to a remote shell: it waits for work, executes that work, returns status, and waits for more work.](/images/slurm-diag.png "SLURM Architecture")
+
+{{< figure src="/images/slurm-diag.png" attr="SLURM architecture. Slurm has a centralized manager, slurmctld, to monitor resources and work. Each compute server (node) has a slurmd daemon, which can be compared to a remote shell: it waits for work, executes that work, returns status, and waits for more work." align=center target="_blank" >}}
 
 SLURM makes it super easy to simplify and streamline the job submission process, without having to rely on complicated Python or Bash scripting. It also allows for proper resource allocation depending on the job's requirements, which is essential in an HPC environment, *especially with multiple people using it*.
 

@@ -1,0 +1,39 @@
+baseURL: https://example.org/
+languageCode: en-us
+title: Naveen Kannan
+theme: ["PaperMod"]
+params:
+  profileMode:
+    enabled: true
+    title: "Database Engineer" # optional default will be site title
+    subtitle: "My data driven blog"
+    imageUrl: "/images/avatar.png" # optional
+    imageWidth: 196 # custom size
+    imageHeight: 313 # custom size
+  ShowReadingTime: true
+
+  socialIcons: # optional
+    - name: github
+      url: "https://github.com/naveenk2022"
+    - name: linkedin
+      url: "https://www.linkedin.com/in/naveenkannan1/"
+
+languages:
+  en:
+    languageName: "English"
+    weight: 1
+    taxonomies:
+      category: categories
+      tag: tags
+      series: series
+    menu:
+      main:
+        - name: Posts
+          url: posts/
+          weight: 10
+        - name: Search
+          url: search/
+          weight: 20
+        - name: Tags
+          url: tags/
+          weight: 10
