@@ -20,7 +20,9 @@ params:
   assets:
     favicon: "assets/favicon.svg"
     favicon16x16: "assets/favicon.svg" 
-    favicon32x32: "assets/favicon.svg" 
+    favicon32x32: "assets/favicon.svg"
+    apple_touch_icon: "assets/favicon.svg"
+    safari_pinned_tab: "assets/favicon.svg"
 languages:
   en:
     languageName: "English"
