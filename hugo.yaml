@@ -31,6 +31,9 @@ languages:
         - name: Posts
           url: posts/
           weight: 10
+        - name: Publications
+          url: publications 
+          weight: 10
         - name: Search
           url: search/
           weight: 20
