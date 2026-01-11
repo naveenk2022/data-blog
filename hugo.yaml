@@ -17,7 +17,9 @@ params:
       url: "https://github.com/naveenk2022"
     - name: linkedin
       url: "https://www.linkedin.com/in/naveenkannan1/"
-
+  assets:
+    favicon: "favicon.svg"
+    apple_touch_icon: "apple-touch-icon.png"
 languages:
   en:
     languageName: "English"

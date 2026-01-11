@@ -27,7 +27,7 @@ September 2016 - March 2020
 
 ## Experience
 
-<span style="color: #3182bd;">**Database Engineer**</span>
+**Database Engineer**
 
 Trailhead Biosystems, Cleveland, Ohio
 
