@@ -8,6 +8,14 @@ weight: 10
 draft: false
 ShowToc: true
 TocOpen: true
+cover:
+  image: "images/ansible_logo.png"
+  alt: "<alt text>"
+  caption: "<text>"
+  relative: false 
+  hidden: false
+  hiddenInList: true
+  hiddenInSingle: false
 params:
   ShowCodeCopyButtons: true
   ShowReadingTime: true
