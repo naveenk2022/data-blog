@@ -43,7 +43,11 @@ SLURM is uniquely suited for use in HPC clusters, due to its ability to facilita
 SLURM places jobs/tasks in a queue, and access to resources is allowed based on the processes that are already running at the time, which is very well suited for an HPC cluster, where resources are under heavy usage.
 
 
-{{< figure src="/images/slurm-diag.png" attr="SLURM architecture. Slurm has a centralized manager, slurmctld, to monitor resources and work. Each compute server (node) has a slurmd daemon, which can be compared to a remote shell: it waits for work, executes that work, returns status, and waits for more work." align=center target="_blank" >}}
+{{< figure 
+  src="slurm-diag.png" 
+  attr="SLURM architecture. Slurm has a centralized manager, slurmctld, to monitor resources and work. Each compute server (node) has a slurmd daemon, which can be compared to a remote shell: it waits for work, executes that work, returns status, and waits for more work." 
+  align=center
+>}}
 
 SLURM makes it super easy to simplify and streamline the job submission process, without having to rely on complicated Python or Bash scripting. It also allows for proper resource allocation depending on the job's requirements, which is essential in an HPC environment, *especially with multiple people using it*.
 
