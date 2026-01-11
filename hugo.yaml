@@ -1,7 +1,7 @@
 baseURL: https://example.org/
 languageCode: en-us
 title: Naveen Kannan
-theme: ["PaperMod"]
+theme: ["hugo-Papermod"]
 params:
   profileMode:
     enabled: true
@@ -36,4 +36,7 @@ languages:
           weight: 20
         - name: Tags
           url: tags/
+          weight: 10
+        - name: About
+          url: about 
           weight: 10
