@@ -1,4 +1,4 @@
-baseURL: https://https://naveenk2022.github.io/data-blog/
+baseURL: https://naveenk2022.github.io/data-blog/
 languageCode: en-us
 title: Naveen Kannan
 theme: ["hugo-Papermod"]
@@ -52,3 +52,9 @@ outputs:
 caches:
   images:
     dir: :cacheDir/images
+module:
+  mounts:
+  - source: assets
+    target: assets
+  - source: static
+    target: assets
