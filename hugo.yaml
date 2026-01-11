@@ -18,8 +18,9 @@ params:
     - name: linkedin
       url: "https://www.linkedin.com/in/naveenkannan1/"
   assets:
-    favicon: "favicon.svg"
-    apple_touch_icon: "apple-touch-icon.png"
+    favicon: "assets/favicon.svg"
+    favicon16x16: "assets/favicon.svg" 
+    favicon32x32: "assets/favicon.svg" 
 languages:
   en:
     languageName: "English"
