@@ -8,6 +8,7 @@ params:
     title: "Database Engineer" # optional default will be site title
     subtitle: "My data driven blog"
     imageUrl: "/images/avatar.png" # optional
+    imageTitle: "The Tri-Angled Truth"
     imageWidth: 196 # custom size
     imageHeight: 313 # custom size
   ShowReadingTime: true
