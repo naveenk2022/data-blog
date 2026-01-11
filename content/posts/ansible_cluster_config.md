@@ -1,7 +1,7 @@
 ---
 title: "Using Ansible to remotely configure a cluster."
 date: '2023-06-24'
-categories: ['Computing','Clusters','Discussion','Ansible','Docker','Containers']
+tags: ['Computing','Clusters','Discussion','Ansible','Docker','Containers']
 description: "Using a containerized instance of Ansible to remotely connect to a cluster and perform a simple ping task to confirm connection."
 author: ["Naveen Kannan"]
 weight: 10
