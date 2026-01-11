@@ -40,3 +40,9 @@ languages:
         - name: About
           url: about 
           weight: 10
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON 
