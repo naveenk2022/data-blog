@@ -112,7 +112,7 @@ ssh-keygen -lf $PGHOME/.ssh/known_hosts
 
 ## On the SFTP server host
 
-### *Create a directory that the SFTP user account will be restricted to.*
+### Create a directory that the SFTP user account will be restricted to.
 
 We create a dedicated /data directory separate from standard system paths to isolate backup data and simplify permission management.
 
@@ -130,7 +130,7 @@ chmod 701 /data
 chown root:root /data
 ```
 
-### *Create an SFTP group, followed by an SFTP user with minimal permissions and as a system user.*
+### Create an SFTP group, followed by an SFTP user with minimal permissions and as a system user.
 
 ```bash
 # Creating an SFTP group
@@ -141,7 +141,7 @@ useradd -g sftpusers -d /data/sftpuser/upload/ -s /usr/sbin/nologin -r sftpuser
 
 This process creates a group called `sftpusers` and creates a system user in that group called `sftpuser`, with their home directory being `/data/sftpuser/upload`.
 
-### *Change the permissions for the SFTP directory.*
+### Change the permissions for the SFTP directory.
 
 ```bash
 ## Giving ownership to the sftpusers group for the sftpuser folder
@@ -153,7 +153,7 @@ chown sftpuser:sftpusers /data/sftpuser/upload
 
 It is very important that `/data/sftpuser/upload` must *not* be owned by root. This is a common cause of failure for chroot setups.
 
-### *Updating the SSH configuration on the SFTP server.*
+### Updating the SSH configuration on the SFTP server.
 
 Add the following to the end `/etc/ssh/sshd_config`:
 
@@ -178,7 +178,7 @@ Here's what this does:
 
 -   The fifth line `X11Forwarding no` disables X11 forwarding to prevent GUI application tunneling over SSH.
 
-### *Validate your SSH config and then Restart the SSH daemon*
+### Validate your SSH config and then Restart the SSH daemon
 
 ```bash
 sudo sshd -T && sudo systemctl restart sshd
@@ -188,7 +188,7 @@ sudo sshd -T && sudo systemctl restart sshd
 Do not restart the SSH daemon without validating your SSH config with `sudo sshd -T`! If your config is wrong, the daemon will fail to initiate, and you may be locked out of being able to SSH into the server!
 :::
 
-### *Create the SSH directory for the sftpuser account with appropriate permissions*
+### Create the SSH directory for the sftpuser account with appropriate permissions
 
 ```bash
 # Creating the .ssh directory
@@ -205,7 +205,7 @@ chmod 640 /data/sftpuser/upload/.ssh/authorized_keys
 chmod 644 /data/sftpuser/upload/.ssh/known_hosts
 ```
 
-### *Append the contents of the new public SSH key to the authorized_keys file*
+### Append the contents of the new public SSH key to the authorized_keys file
 
 On the database host, copy the contents of the public key we created (`$PGHOME/.ssh/id_ed25519_sftp_key.pub`) and append it to the authorized_keys file on the SFTP user's SSH directory ('/data/sftpuser/upload/.ssh/authorized_keys').
 
