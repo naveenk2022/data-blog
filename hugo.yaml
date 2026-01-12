@@ -1,7 +1,7 @@
 baseURL: https://naveenk2022.github.io/data-blog
 languageCode: en-us
 title: Naveen Kannan
-theme: ["hugo-Papermod"]
+theme: ["hugo-PaperMod"]
 params:
   profileMode:
     enabled: true
@@ -20,7 +20,7 @@ params:
       url: "https://www.linkedin.com/in/naveenkannan1/"
   assets:
     favicon: "assets/favicon.svg"
-    favicon16x16: "assets/favicon.svg" 
+    favicon16x16: "assets/favicon.svg"
     favicon32x32: "assets/favicon.svg"
     apple_touch_icon: "assets/favicon.svg"
     safari_pinned_tab: "assets/favicon.svg"
@@ -38,7 +38,7 @@ languages:
           url: posts/
           weight: 10
         - name: Publications
-          url: publications 
+          url: publications
           weight: 10
         - name: Search
           url: search/
@@ -47,18 +47,18 @@ languages:
           url: tags/
           weight: 10
         - name: About
-          url: about 
+          url: about
           weight: 10
 
 outputs:
   home:
     - HTML
     - RSS
-    - JSON 
+    - JSON
 caches:
   images:
     dir: :cacheDir/images
-  
+
 module:
   mounts:
   - source: assets
