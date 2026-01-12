@@ -184,9 +184,9 @@ Here's what this does:
 sudo sshd -T && sudo systemctl restart sshd
 ```
 
-::: callout-warning
-Do not restart the SSH daemon without validating your SSH config with `sudo sshd -T`! If your config is wrong, the daemon will fail to initiate, and you may be locked out of being able to SSH into the server!
-:::
+{{< notice warning >}}
+Do not restart the SSH daemon without validating your SSH config with the command sudo sshd -T! If your config is wrong, the daemon will fail to initiate, and you may be locked out of being able to SSH into the server!
+{{< /notice >}}
 
 ### Create the SSH directory for the sftpuser account with appropriate permissions
 
@@ -209,9 +209,9 @@ chmod 644 /data/sftpuser/upload/.ssh/known_hosts
 
 On the database host, copy the contents of the public key we created (`$PGHOME/.ssh/id_ed25519_sftp_key.pub`) and append it to the authorized_keys file on the SFTP user's SSH directory ('/data/sftpuser/upload/.ssh/authorized_keys').
 
-::: callout-warning
+{{< notice warning >}}
 Remember to *never share your private key* with any server, or to anyone else! Only copy the contents of the public key!
-:::
+{{< /notice >}}
 
 # Testing
 
