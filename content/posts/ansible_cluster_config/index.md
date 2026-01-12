@@ -12,7 +12,7 @@ cover:
   image: "ansible_logo.png"
   alt: "<alt text>"
   caption: "<text>"
-  relative: false 
+  relative: false
   hidden: false
   hiddenInList: true
   hiddenInSingle: false
@@ -34,9 +34,9 @@ A basic Ansible environment has the following three components:
 -   **Inventory**: This is a list of managed nodes that are organized locally on the **control node**. This lists the IP addresses or the hostnames of the remote systems being managed along with any connection information needed.
 
 
-{{< figure 
-    src="ansible_architecture.png" 
-    caption="A flowchart demonstrating the basic architecture of an Ansible environment." 
+{{< figure
+    src="ansible_architecture.png"
+    caption="A flowchart demonstrating the basic architecture of an Ansible environment."
     align=center
 >}}
 
@@ -50,8 +50,8 @@ Ansible uses a declarative language in the YAML format to describe the *desired 
 
 A **Module** is a unit of code that Ansible can run on managed nodes.
 
-{{< figure 
-    src="ansible_playbook_structure.png" 
+{{< figure
+    src="ansible_playbook_structure.png"
     align=center
 >}}
 
@@ -85,20 +85,20 @@ Let's also assume that there are three cluster nodes, each with private IP addre
 -   YY.Y.Y.3
 -   YY.Y.Y.4
 
-{{< figure 
-    src="cluster_config.png" 
-    caption="The example use case for Ansible." 
+{{< figure
+    src="cluster_config.png"
+    caption="The example use case for Ansible."
     align=center
 >}}
 
 # The Ansible Dockerfile
 
-```bash         
+```bash
 # Loading from a miniconda3 image
 FROM continuumio/miniconda3
 
 # Installing Mamba using Conda.
-# I find Mamba to be much faster for package installation compared to Conda. 
+# I find Mamba to be much faster for package installation compared to Conda.
 RUN conda install -c conda-forge mamba -y
 
 # Creating a Mamba ENV called `ansible_env`.
@@ -118,7 +118,7 @@ RUN apt-get update && \
 RUN mamba install -y -c conda-forge ansible
 
 # Generating a configuration file for Ansible.
-# This will need to placed in a particular directory. 
+# This will need to placed in a particular directory.
 WORKDIR /etc
 RUN ansible-config init --disabled -t all > ansible.cfg
 
@@ -138,7 +138,7 @@ The inventory is a list of the managed nodes you intend to connect to, and this 
 
 The `hosts` file can be in `INI` or `YAML` formats. I went with `INI`, as follows:
 
-```ini         
+```ini
 [cluster]
 XXX.XX.XXX.X
 YY.Y.Y.2
@@ -166,8 +166,8 @@ However, in our example set-up, it is not possible to directly SSH into the clus
 
 For the sake of making this process easier to understand, follow this flow chart for a break down of the individual steps.
 
-{{< figure 
-    src="ssh_flowchart.png" 
+{{< figure
+    src="ssh_flowchart.png"
     align=center
 >}}
 
@@ -197,7 +197,7 @@ To reiterate, `path/to/ansible_mount/.ssh` contains both the keys and the `confi
 
 This config file has the following text:
 
-```bash         
+```bash
 Host XXX.XX.XXX.X
     HostName abc.host.domain
 
@@ -225,10 +225,10 @@ Connecting to a server for the first time through SSH requires input from the us
 
 You will see something like this if you're connecting to the head node for the first time:
 
-```         
+```
 The authenticity of host 'YY.Y.Y.4 (<no hostip for proxy command>)' can't be established.
 ECDSA key fingerprint is xxx.
-Are you sure you want to continue connecting (yes/no/[fingerprint])? 
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
 ```
 
 Make sure to type in `yes` and accept this process.
@@ -239,7 +239,7 @@ From the docker container, I ran:
 
 You will see something like:
 
-```         
+```
 /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/root/.ssh/id_ed25519.pub"
 /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
 /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
@@ -247,7 +247,7 @@ You will see something like:
 
 Enter your password when prompted and you should see:
 
-```         
+```
 Number of key(s) added: 1
 
 Now try logging into the machine, with:   "ssh 'sudo_user@abc.host.domain'"
@@ -296,7 +296,7 @@ From the container, I ran:
 
 For every single cluster. Enter the password when prompted. Again, like before, you should see something like:
 
-```         
+```
 /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/root/.ssh/id_ed25519.pub"
 /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
 /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
@@ -304,7 +304,7 @@ For every single cluster. Enter the password when prompted. Again, like before, 
 
 Enter your password for the `sudo_user` on the cluster nodes. Again, you should see something like:
 
-```         
+```
 Number of key(s) added: 1
 
 Now try logging into the machine, with:   "ssh 'sudo_user@YY.Y.Y.2'"
@@ -348,7 +348,7 @@ Once inside, run
 
 Replacing `<sudo_user>` with the user who has SSH access to the nodes.
 
-```bash         
+```bash
 XXX.XX.XXX.X | SUCCESS => {
     "ansible_facts": {
         "discovered_interpreter_python": "/usr/libexec/platform-python"
