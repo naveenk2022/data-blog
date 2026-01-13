@@ -127,7 +127,6 @@ This above script installs `mamba` into the `base` conda environment and then ac
 > [!NOTE]
 Remember that the only packages you want installed in the `base` conda environment are `mamba` and `conda`, nothing else.
 
-
 ### Micromamba
 
 The [documentation for installation of `micromamba` can be found here.](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html)
