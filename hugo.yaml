@@ -35,7 +35,7 @@ languages:
     menu:
       main:
         - name: Posts
-          url: posts/
+          url: archives/
           weight: 10
         - name: Publications
           url: publications
