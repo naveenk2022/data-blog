@@ -59,9 +59,8 @@ Mamba's features include:
 
 Conda excels in creating **virtual environments** that help keep your base environment clutter-free. Initiating a Conda virtual environment helps you keep the dependencies for a particular project *limited to that environment.* No need to run the risk of nuking your workflow simply because you had to install Python 2.7 as a dependency for an old package that the maintainer never got around to updating.
 
-{{< notice note >}}
+> [!NOTE]
 Remember that `mamba` environments are essentially `conda` environments with `mamba` enabled. Functionally speaking, there is no difference between a `mamba` env and a `conda` env.
-{{< /notice >}}
 
 # Implementing Mamba into your workflow
 
@@ -83,14 +82,13 @@ If you're intending on installing `mamba`, the official documentation says to en
 
 Note that as of August 2023, `miniforge` and `mambaforge` are essentially the same thing.
 
-{{< notice note >}}
-From the [official miniforge documentation](https://github.com/conda-forge/miniforge),
-
-After the release of Miniforge 23.3.1 in August 2023, Miniforge and Mambaforge are essentially identical. The only difference is the name of the installer and subsequently the default installation path.
-
-Before that release, Miniforge only shipped conda, while Mambaforge added mamba on top. Since Miniconda started shipping conda-libmamba-solver in July 2023, Miniforge followed suit and started shipping it too in August. At that point, since conda-libmamba-solver depends on libmambapy, the only difference between Miniforge and Mambaforge was the presence of the mamba Python package. To minimize surprises, we decided to add mamba to Miniforge too.
-
-{{< /notice >}}
+> [!NOTE]
+>
+>From the [official miniforge documentation](https://github.com/conda-forge/miniforge),
+>
+>After the release of Miniforge 23.3.1 in August 2023, Miniforge and Mambaforge are essentially identical. The only difference is the name of the installer and subsequently the default installation path.
+>
+>Before that release, Miniforge only shipped conda, while Mambaforge added mamba on top. Since Miniconda started shipping conda-libmamba-solver in July 2023, Miniforge followed suit and started shipping it too in August. At that point, since conda-libmamba-solver depends on libmambapy, the only difference between Miniforge and Mambaforge was the presence of the mamba Python package. To minimize surprises, we decided to add mamba to Miniforge too.
 
 Given that the official documentation encourages the use of Miniforge over Mambaforge, the rest of this blog post will be looking at installing and using Miniforge.
 
@@ -126,9 +124,9 @@ conda activate
 
 This above script installs `mamba` into the `base` conda environment and then activates the conda environment, enabling the usage of `mamba`. Now, using `mamba` is as simple as replacing all instances of `conda` with `mamba`!
 
-::: callout-note
+> [!NOTE]
 Remember that the only packages you want installed in the `base` conda environment are `mamba` and `conda`, nothing else.
-:::
+
 
 ### Micromamba
 
@@ -136,9 +134,9 @@ The [documentation for installation of `micromamba` can be found here.](https://
 
 `micromamba` is a tiny executable version of the `mamba` package manager. It is a statically linked C++ executable with a separate command line interface. It comes with an empty base environment, and does not come with a default version of Python or `conda`.
 
-::: callout-note
+> [!NOTE]
 As a prerequisite, basic utilities (such as `curl`,`tar` and `bzip2`) need to be installed. Also you need a glibc based system like Ubuntu, Fedora or Centos (Alpine Linux does not work natively).
-:::
+
 
 The following magic URL always returns the latest available version of `micromamba`, and the `bin/micromamba` part is automatically extracted using `tar`.
 
