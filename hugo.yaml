@@ -5,8 +5,7 @@ theme: ["hugo-admonitions", "hugo-PaperMod"]
 params:
   profileMode:
     enabled: true
-    title: "Database Engineer" # optional default will be site title
-    subtitle: "My data driven blog"
+    title: "Database Engineer"
     imageUrl: "/images/avatar.png" # optional
     imageTitle: "The Tri-Angled Truth"
     imageWidth: 196 # custom size
