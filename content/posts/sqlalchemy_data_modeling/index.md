@@ -38,6 +38,31 @@ A well defined and **normalized** data model becomes scalable, and allows for su
 
 - Modular
 
-A database with a well designed and thoroughly documented data model becomes easy to use by downstream teams such as API designers and front-end developers, minimizing the communication needed for these teams to function independantly. Good design will naturally flow downstream of a properly normalized database.
+A database with a well designed and thoroughly documented data model becomes easy to use by downstream teams such as API designers and front-end developers, minimizing the communication needed for these teams to function independently. Good design will naturally flow downstream of a properly normalized database.
 
 Efficient data model design can help your database be a bedrock for your fellow team members to rely on.
+
+## SQLAlchemy
+
+[SQLAlchemy](https://www.sqlalchemy.org) is a Python SQL toolkit and ORM (Object Relational Mapper) that allows Python developers to work with relational databases using the Python language. SQLAlchemy is indispensable if you're a Python developer looking to create a relational data model for your database. The two most significant components of SQLAlchemy are it's **Object Relational Mapper (ORM)** and **SQLAlchemy Core**.
+
+- SQLAlchemy Core
+
+SQLALchemy Core is the foundation of SQLAlchemy, and is independant of the ORM. It provides the connectivity to the database, and by allowing for the construction of SQL expressions that can then be executed against a target database, enabling interaction with a database to in the form of queries.
+
+- SQLAlchemy ORM
+
+The SQLAlchemy ORM (Object Relational Mapper) uses Core as a foundation. The ORM will be the bulk of what we discuss in this blog post. The ORM builds on Core to help create user-defined Python classes that can be mapped into database tables. The ORM is what allows SQLAlchemy to define a data model for a relational database.
+
+{{< figure
+    src="https://docs.sqlalchemy.org/en/20/_images/sqla_arch_small.png"
+    caption="The major components of SQLAlchemy. "
+    attr="Taken from the [SQLAlchemy documentation.](https://docs.sqlalchemy.org/en/20/intro.html)"
+    align=center
+>}}
+
+## What we'll cover
+
+In this blog post, we will cover how you can begin using SQLAlchemy to start developing the first iteration of your data model. I will go over how SQLAlchemy establishes a connection to your database, and how you can start building a relational data model.
+
+In future posts, we will cover how you can use Alembic to generate database migrations and help grow your database within a version-controlled system, and how this data model can then be plugged into a FastAPI server as a module to help design a modern API service.
