@@ -12,7 +12,7 @@ cover:
   image: "hive.jpg"
   alt: "<alt text>"
   caption: "The Hive logo."
-  relative: false 
+  relative: false
   hidden: false
   hiddenInList: true
   hiddenInSingle: false
@@ -21,24 +21,24 @@ params:
   ShowReadingTime: true
 ---
 
-# What is Hive? 
+# What is Hive?
 
 Apache Hive is a distributed, fault-tolerant data warehouse system, built on top of Hadoop, designed to simplify and streamline the processing of large datasets.
 
-Through Hive, a user can manage and analyze massive volumes of data by organizing it into tables, resembling a traditional relational database. 
+Through Hive, a user can manage and analyze massive volumes of data by organizing it into tables, resembling a traditional relational database.
 
-Hive uses the HiveQL (HQL) language, which is very similar to SQL. These SQL-like queries get translated into MapReduce tasks, leveraging the power of Hadoop's MapReduce functionalities while bypassing the need to know how to program MapReduce jobs. 
+Hive uses the HiveQL (HQL) language, which is very similar to SQL. These SQL-like queries get translated into MapReduce tasks, leveraging the power of Hadoop's MapReduce functionalities while bypassing the need to know how to program MapReduce jobs.
 
-Hive abstracts the complexity of Java-based utilization of Hadoop's file storage system.  It is best used for traditional data warehousing tasks. 
+Hive abstracts the complexity of Java-based utilization of Hadoop's file storage system.  It is best used for traditional data warehousing tasks.
 
-In this blog post, we will look at installing Hive on a Hadoop cluster utilizing Ansible! 
+In this blog post, we will look at installing Hive on a Hadoop cluster utilizing Ansible!
 
 # What is Ansible?
 
 Ansible is an open-source IT automation tool that allows for automated management of remote systems.
 
-{{< figure 
-    src="ansible_logo.png" 
+{{< figure
+    src="ansible_logo.png"
     align=center
 >}}
 
@@ -50,8 +50,8 @@ A basic Ansible environment has the following three components:
 
 -   **Inventory**: This is a list of managed nodes that are organized locally on the **control node**. This lists the IP addresses or the hostnames of the remote systems being managed along with any connection information needed.
 
-{{< figure 
-    src="ansible_architecture.png" 
+{{< figure
+    src="ansible_architecture.png"
     caption="A flowchart demonstrating the basic architecture of an Ansible environment."
     align=center
 >}}
@@ -62,13 +62,13 @@ I have a blog post detailing the basics of Ansible and it's relevance in a compu
 
 -   An installation of Ansible (In a [previous post](https://naveenkannan.netlify.app/posts/ansible_cluster/ansible_cluster_config), I set up Ansible in a Docker container, minimizing the overhead on the actual cluster nodes).
 
--   Password-less SSH connections set up between each node and the node (or container) you are running Ansible from. 
+-   Password-less SSH connections set up between each node and the node (or container) you are running Ansible from.
 
 -   The inventory file, defined at `/etc/Ansible/hosts`.
 
 -   An installation of Hadoop, with HDFS, YARN, MapReduce and Spark configured and running. [This post covers the basic overview of the installation and configuration of Hadoop and Spark.](https://naveenkannan.netlify.app/posts/hadoop_spark/hadoop_spark)
 
-I used Ansible from a Docker container to configure a 4 node cluster. The cluster inventory file is in the `INI` format as follows: 
+I used Ansible from a Docker container to configure a 4 node cluster. The cluster inventory file is in the `INI` format as follows:
 
 ```ini
 [cluster]
@@ -86,21 +86,21 @@ YY.Y.Y.3
 YY.Y.Y.4
 ```
 
-{{< figure 
-    src="cluster_config.png" 
+{{< figure
+    src="cluster_config.png"
     caption="The architecture used in this blog post."
     align=center
 >}}
 
-# What are Playbooks? 
+# What are Playbooks?
 
 Ansible playbooks provide a simple and reusable method to define the configuration and management of multi-machine systems, and is well equipped to handling tasks that can range from simple ones like installing software packages to complex ones like configuring multiple servers with specific roles.
 
-# Playbook Syntax 
+# Playbook Syntax
 
 YAML *(YAML Ain't Markup Language)* is a human-readable data serialization format that plays a pivotal role in Ansible playbooks.
 
-YAML files use key-value pairs, lists, and nested structures to represent data. It eschews complex symbols, relying instead on whitespace and line breaks to delineate data structures, making it easy to grasp and write, even for those without extensive programming experience. 
+YAML files use key-value pairs, lists, and nested structures to represent data. It eschews complex symbols, relying instead on whitespace and line breaks to delineate data structures, making it easy to grasp and write, even for those without extensive programming experience.
 
 Playbooks are automation blueprints. Playbooks contain plays, which are a list of tasks that map to each managed node in the predefined inventory.
 
@@ -116,9 +116,9 @@ Each play defines two things:
 
 # An Example Playbook!
 
-Let's jump right in! The following is a playbook that installs Hive on a cluster with a head node and 3 cluster nodes. 
+Let's jump right in! The following is a playbook that installs Hive on a cluster with a head node and 3 cluster nodes.
 
-The head node runs Rhel 8 and the 3 cluster nodes run Ubuntu. 
+The head node runs Rhel 8 and the 3 cluster nodes run Ubuntu.
 
 ```yaml
 - name: Installing Apache Hive and its prerequisties on the RHEL 8 head node.
@@ -181,7 +181,7 @@ The head node runs Rhel 8 and the 3 cluster nodes run Ubuntu.
         log4j.appender.mrappmaster=org.apache.log4j.ConsoleAppender
         log4j.appender.mrappmaster.layout=org.apache.log4j.PatternLayout
         log4j.appender.mrappmaster.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
-        
+
   - name: Reloading the shell
     ansible.builtin.shell: source ~/.bashrc
 
@@ -214,7 +214,7 @@ The head node runs Rhel 8 and the 3 cluster nodes run Ubuntu.
       schematool -dbType derby -initSchema
     args:
       executable: /bin/bash
-      
+
   - name: Creating a hive-site.xml file
     copy:
       dest: /opt/apache-hive-3.1.3-bin/conf/hive-site.xml
@@ -359,9 +359,9 @@ The head node runs Rhel 8 and the 3 cluster nodes run Ubuntu.
       line: spark.sql.warehouse.dir=hdfs://localhost:9000/user/hive/warehouse
 ```
 
-# Code Breakdown 
+# Code Breakdown
 
-Let's look at the code. 
+Let's look at the code.
 
 ## Part 1: Defining a play
 
@@ -372,18 +372,18 @@ Let's look at the code.
   become: true
   become_user: temp
   become_method: sudo
-  
+
 ```
 
-This section defines the play with the title "Installing Apache Hive and its prerequisties on the RHEL 8 head node". 
+This section defines the play with the title "Installing Apache Hive and its prerequisties on the RHEL 8 head node".
 
 `hosts` defines the managed node to run this playbook on (in this case, the Rhel 8 head node, named `head_node` in the inventory file).
 
-`become` tells Ansible that this play needs to be executed with elevated privileges. 
+`become` tells Ansible that this play needs to be executed with elevated privileges.
 
 `become_user` defines the user to run the commands defined by Ansible as. (in this case, `temp` is the user.)
 
-`become_method` tells Ansible that the method to elevate the privilieges by is `sudo`. 
+`become_method` tells Ansible that the method to elevate the privilieges by is `sudo`.
 
 ## Part 2: Downloading Hive (with it's prerequisites)
 
@@ -443,13 +443,13 @@ This section defines the play with the title "Installing Apache Hive and its pre
         log4j.appender.mrappmaster=org.apache.log4j.ConsoleAppender
         log4j.appender.mrappmaster.layout=org.apache.log4j.PatternLayout
         log4j.appender.mrappmaster.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
-  
+
   - name: Reloading the shell
     ansible.builtin.shell: source ~/.bashrc
 
 ```
 
-This code of chunk downloads Maven (a software project management and comprehension tool), and installs it, and then proceeds to download and install Hive, and then updates the `.bashrc` file to add the installed binaries. 
+This code of chunk downloads Maven (a software project management and comprehension tool), and installs it, and then proceeds to download and install Hive, and then updates the `.bashrc` file to add the installed binaries.
 
 Commands like `ansible.builtin.blockinfile` and `ansible.builtin.get_url` are modules that are built-in by Ansible to perform particular functions, and are part of each named task, which are themselves a part of each named play.
 
@@ -485,7 +485,7 @@ Commands like `ansible.builtin.blockinfile` and `ansible.builtin.get_url` are mo
       schematool -dbType derby -initSchema
     args:
       executable: /bin/bash
-      
+
   - name: Creating a hive-site.xml file
     copy:
       dest: /opt/apache-hive-3.1.3-bin/conf/hive-site.xml
@@ -515,9 +515,9 @@ Commands like `ansible.builtin.blockinfile` and `ansible.builtin.get_url` are mo
 
 ```
 
-Let's reiterate. The first few lines define the play, which is to configure Hive. What follows that are tasks, whice each have a name and run a module. This above chunk initiates the Hive warehouse and creates a hive-site.xml file to use so that Spark can detect and use the Hive Metastore. Modules are the commands like `ansible.builtin.shell` and `ansible.builtin.lineinfile`, and they execute specific functions. 
+Let's reiterate. The first few lines define the play, which is to configure Hive. What follows that are tasks, whice each have a name and run a module. This above chunk initiates the Hive warehouse and creates a hive-site.xml file to use so that Spark can detect and use the Hive Metastore. Modules are the commands like `ansible.builtin.shell` and `ansible.builtin.lineinfile`, and they execute specific functions.
 
-## Part 4: Downloading and configuring Hive for the cluster nodes 
+## Part 4: Downloading and configuring Hive for the cluster nodes
 
 ```yaml
 - name: Installing Apache Hive and its prerequisties on the Ubuntu cluster nodes.
@@ -644,4 +644,3 @@ This chunk of code performs the same tasks that the first three did, but on the 
 -   [Hive Basics](https://cwiki.apache.org/confluence/display/Hive/Tutorial#Tutorial-Concepts)
 -   [Ansible Modules](https://docs.ansible.com/ansible/latest/plugins/module.html)
 -   [Ansible Playbooks](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html)
-
