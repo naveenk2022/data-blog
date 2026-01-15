@@ -1,7 +1,7 @@
 ---
 title: "Relational Data Model design with SQLALchemy."
 date: "2026-01-13"
-tags: ['Database','Database Design','PostgreSQL','Data Model','RDBMS','SQLAlchemy','Alembic']
+tags: ['Python', 'PostgreSQL', 'SQLAlchemy', 'Alembic', 'ORM', 'Database Design', 'Database Migrations', 'Tutorial']
 description: "An introduction to using SQLAlchemy and Alembic for relational data model design. "
 author: ["Naveen Kannan"]
 weight: 10
@@ -48,7 +48,7 @@ Efficient data model design can help your database be a bedrock for your fellow 
 
 - SQLAlchemy Core
 
-SQLALchemy Core is the foundation of SQLAlchemy, and is independant of the ORM. It provides the connectivity to the database, and by allowing for the construction of SQL expressions that can then be executed against a target database, enabling interaction with a database to in the form of queries.
+SQLALchemy Core is the foundation of SQLAlchemy, and is independent of the ORM. It provides the connectivity to the database, and by allowing for the construction of SQL expressions that can then be executed against a target database, enabling interaction with a database to in the form of queries.
 
 - SQLAlchemy ORM
 
@@ -112,7 +112,7 @@ Lets now get into actually creating some data models!
 
 ## Setting up the Alembic environment
 
-Before we can start working with our PostgreSQL database, we will first set up the migration environment using Alembic. The reason we set this up first is because we will use Almbic's config files to connect to our database first before we can begin creating our data model. Alembic uses SQLAlchemy core's `Engine` object as a dependency when connecting to a database.
+Before we can start working with our PostgreSQL database, we will first set up the migration environment using Alembic. The reason we set this up first is because we will use Alembic's config files to connect to our database first before we can begin creating our data model. Alembic uses SQLAlchemy core's `Engine` object as a dependency when connecting to a database.
 
 In the root of your project directory, run:
 
@@ -131,7 +131,7 @@ This will generate a directory of scripts. The root of your project directory wi
 └── alembic.ini
 ```
 
-The directory now inclues these files of importance:
+The directory now includes these files of importance:
 
 ### `alembic.ini`
 This is Alembic's main configuration file. When Alembic is run, it looks in the directory for this file. This file is where you will add the SQLAlchemy URL to connect to your database. You can also define **multiple** environments to run migrations in.
@@ -409,7 +409,7 @@ This object describes the attributes of each individual order. `order_id` is the
     )
 ```
 
-This ensures that each order needs to have an association with an existing `customer_id` value. Orders that aren't associated with any customers, or are associated with non-existant customers, will not be possible to add to this table.
+This ensures that each order needs to have an association with an existing `customer_id` value. Orders that aren't associated with any customers, or are associated with non-existent customers, will not be possible to add to this table.
 
 We also establish a many-to-one relationship between `orders` and `customers` using the following code snippet:
 
