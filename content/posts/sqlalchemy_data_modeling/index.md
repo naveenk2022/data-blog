@@ -354,6 +354,7 @@ class orders(Base):
   customer_id = Column(
         Integer,
         ForeignKey("customers.customer_id", ondelete="CASCADE"),
+        nullable = False
     )
   order_date =  Column(
         DateTime(timezone=True)
@@ -689,7 +690,7 @@ def upgrade() -> None:
     )
     op.create_table('orders',
     sa.Column('order_id', sa.Integer(), sa.Identity(always=True, cycle=True), nullable=False),
-    sa.Column('customer_id', sa.Integer(), nullable=True),
+    sa.Column('customer_id', sa.Integer(), nullable=False),
     sa.Column('order_date', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['customer_id'], ['customers.customer_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('order_id')
