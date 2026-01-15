@@ -248,7 +248,7 @@ format = %(levelname)-5.5s [%(name)s] %(message)s
 datefmt = %H:%M:%S
 ```
 
-To begin with, we will substitute the `sqlalchemy.url` parameter for the `alembic` section with the connection string used for our database. 
+To begin with, we will substitute the `sqlalchemy.url` parameter for the `alembic` section with the connection string used for our database. As an example, here's a dummy connection string.
 
 ```ini
 sqlalchemy.url = postgresql://nk_dev:placeholder_password@localhost/development
@@ -269,7 +269,7 @@ In the above code snippet:
 > Ideally you manage them with a key vault or via injection of environment variables at the time of virtual environment activation.
 > Remember to **never** include the alembic.ini file within version control. Always have your config file (`alembic.ini`) added to `.gitignore`.
 >
-> `.gitignore:`
+> Here are the contents of the `.gitignore:` file:
 >```
 >alembic.ini
 >```
@@ -288,3 +288,8 @@ This is a Python script that can be run when the migration tool is invoked. You 
 
 This directory holds the individual version scripts. This directory will have the scripts in it run sequentially when upgrading to or downgrading to a particular version of your database. As you begin generating migrations and applying them, this folder will grow. Each migration will become it's own script, containing both an `upgrade` and a `downgrade` parameter for that particular version. 
 
+Now that all of this is finally sorted, we can get to creating basic data models! 
+
+## Creating a file for our data models
+
+Create a file in the project directory called `models.py`. This file will be where we store our user-defined Python classes that will then be mapped into database tables in the database using Alembic to run the actual migrations.
