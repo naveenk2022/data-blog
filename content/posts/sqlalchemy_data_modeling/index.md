@@ -71,6 +71,16 @@ Alembic is a great way to test your migrations and schema design in a developmen
 
 In this blog post, we will cover how you can begin using SQLAlchemy and Alembic to start developing the first iteration of your data model. 
 
+We will do the following:
+
+- Create a virtual environment with SQLAlchemy and Alembic installed
+- Initialize Alembic
+- Design a simple, rudimentary data model with three tables
+- Configure Alembic to connect to your database
+- Utilize Alembic to generate a migration script
+- Migrate your initial data model to the database for the first time
+
+
 In future posts, we will cover how you can use Alembic to generate database migrations and help grow your database within a version-controlled system, and how this data model can then be plugged into a FastAPI server as a module to help design a modern API service.
 
 # Prerequisites
@@ -98,7 +108,7 @@ This will create a micromamba environment with the pinned versions of Python and
 
 Lets now get into actually creating some data models! 
 
-# Creating our first data model
+# Getting Started
 
 ## Setting up the Alembic environment
 
@@ -292,4 +302,313 @@ Now that all of this is finally sorted, we can get to creating basic data models
 
 ## Creating a file for our data models
 
-Create a file in the project directory called `models.py`. This file will be where we store our user-defined Python classes that will then be mapped into database tables in the database using Alembic to run the actual migrations.
+Create a file in the project directory called `models.py`. This file will be where we store our user-defined Python classes that will then be mapped into database tables in the database using Alembic to run the actual migrations. Let's start with a simple scenario where we have commerce data for customers, products and orders. Each customer can submit multiple orders, and each order can have several products in it. 
+
+As a basic assumption, this initial data model isn't bad, but there is plenty of room for improvement and refinement in the future. Let's start with defining these three tables as Python classes first. 
+
+We will build a one-to-many relationship between customers and orders, since every customer can have many orders, and each order belongs to just one customer. We will build a table to define our products as well. 
+
+>[!Note]
+> In future posts, we will expand on this rudimentary data model, building in connections between products and orders. 
+> We will also incorporate additional features into our data model, such as views, functions and triggers.
+
+Here's what your `model.py` file will look like:
+
+```python
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Float,
+    ForeignKey,
+    Identity,
+    Text,
+    DateTime,
+)
+from datetime import datetime, UTC
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+
+Base = declarative_base()
+
+class customers(Base):
+    __tablename__ = "customers"
+    customer_id = Column(
+        Integer, Identity(cycle=True, always=True), primary_key=True
+    )
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    email_address = Column(String, nullable = False)
+    orders = relationship(
+        "orders",
+        back_populates="customers",
+        cascade="all, delete-orphan",
+    )
+
+class orders(Base):
+  __tablename__ = "orders"
+  order_id = Column(
+        Integer, Identity(cycle=True, always=True), primary_key=True
+    )
+  customer_id = Column(
+        Integer,
+        ForeignKey("customers.customer_id", ondelete="CASCADE"),
+    )
+  order_date =  Column(
+        DateTime(timezone=True)
+    )
+  customers = relationship(
+        "customers", back_populates="orders"
+    )
+
+class products(Base):
+  __tablename__ = "products"
+  product_id = Column(
+        Integer, Identity(cycle=True, always=True), primary_key=True
+    )
+  product_name = Column(
+        String, nullable=False
+        )
+  description = Column(Text)
+  price = Column(Float, nullable=False)
+```
+
+Here's what the above code does.
+
+We have created the following objects: `customers`, `orders` and `products`. 
+
+### `customers`:
+
+This object describes the attributes of the customers. The `customer_id` column is the primary key of the table, and we initialize it as a serialized integer. 
+`first_name`,`last_name` and `email` are string columns that cannot be null, and need to be present in the data. This code snippet:
+
+```python
+orders = relationship(
+        "orders",
+        back_populates="customers",
+        cascade="all, delete-orphan",
+    )
+```
+establishes a one-to-many relationship between `customers` and `orders`.
+
+### `orders`:
+
+This object describes the attributes of each individual order. `order_id` is the primary key of this table. We designate the `customer_id` column as a foreign key from the `customers` table with this code snippet:
+
+```python
+  customer_id = Column(
+        Integer,
+        ForeignKey("customers.customer_id", ondelete="CASCADE"),
+    )
+```
+
+This ensures that each order needs to have an association with an existing `customer_id` value. Orders that aren't associated with any customers, or are associated with non-existant customers, will not be possible to add to this table.
+
+We also establish a many-to-one relationship between `orders` and `customers` using the following code snippet:
+
+```python
+  customers = relationship(
+        "customers", back_populates="orders"
+    )
+```
+
+### `products`:
+
+This object describes the attributes of each individual product. `product_id` is the primary key of this table, and this table does not have any relationships with any other tables yet. This data model is currently incomplete, but it is a great starting point at which to begin the development and migration of our data model.
+
+With this file complete, our rudimentary data model has been initialized. Without migrating these changes over to the database, however, these will only live as Python classes, and not as database objects. 
+
+## Generating migration scripts. 
+
+The vast majority of database migration workflows with Alembic are done by **auto-generating** migration scripts. To begin auto-generating migration scripts, we will first need to connect Alembic to the database, and then point alembic towards the target metadata we would like to migrate the data model to. 
+
+Alembic can be configured to connect to the database (pointed to be the `sqlalchemy.url` parameter in the `alembic.ini` file). For Alembic to compare the state of the database *against* our target metadata, we will edit `alembic/env.py` so that Alembic can access the table metadata object that contains the target. Configuring Alembic therefore has two components:
+
+- Connecting Alembic to the database, **so that it can compare the state of the database against the target metadata.**
+- Importing the target metadata, **so that Alembic knows what to compare the state of the database against.**
+
+Once `alembic/env.py` is configured, Alembic can then auto generate the “obvious” migrations based on a comparison. In this case, we want it to compare the empty database against our models, and then auto-generate migrations that we can then review and modify before applying.
+
+We have already defined the database connection string in our configuration file. We will begin working with the `env.py` to access the table metadata object that contains the target. 
+
+### Editing `env.py`
+
+Here's what the default content of `alembic/env.py` looks like. The sections that we will edit have been highlighted.
+
+```python {hl_lines=["1-6", "17-21"]}
+from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+
+from alembic import context
+
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+target_metadata = None
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+
+def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode.
+
+    This configures the context with just a URL
+    and not an Engine, though an Engine is acceptable
+    here as well.  By skipping the Engine creation
+    we don't even need a DBAPI to be available.
+
+    Calls to context.execute() here emit the given string to the
+    script output.
+
+    """
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode.
+
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+
+    """
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection, target_metadata=target_metadata
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()
+```
+
+First, we will import the `models.py` script. Edit the highlighted snippet to add an import statement. 
+
+```python
+from models import Base
+```
+
+Then we will replace the `target_metadata` value with the metadata of our data model. We will change the scond highlighted section to:
+
+```python
+target_metadata = Base.metadata
+```
+
+Our `env.py` file should now look like the following, with our changes being highlighted.
+
+```python {hl_lines=[7, 22]}
+from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+
+from alembic import context
+from models import Base
+
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+target_metadata = Base.metadata
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+
+def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode.
+
+    This configures the context with just a URL
+    and not an Engine, though an Engine is acceptable
+    here as well.  By skipping the Engine creation
+    we don't even need a DBAPI to be available.
+
+    Calls to context.execute() here emit the given string to the
+    script output.
+
+    """
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode.
+
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+
+    """
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    with connectable.connect() as connection:
+        context.configure(
+            connection=connection, target_metadata=target_metadata
+        )
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()
+```
