@@ -312,7 +312,7 @@ We will build a one-to-many relationship between customers and orders, since eve
 > In future posts, we will expand on this rudimentary data model, building in connections between products and orders. 
 > We will also incorporate additional features into our data model, such as views, functions and triggers.
 
-This is what your `model.py` file will look like:
+This is what your `models.py` file will look like:
 
 ```python
 from sqlalchemy import (
@@ -325,71 +325,76 @@ from sqlalchemy import (
     Text,
     DateTime,
 )
-from datetime import datetime, UTC
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.sql import func
 
 Base = declarative_base()
 
-class customers(Base):
+class Customer(Base):
     __tablename__ = "customers"
+    
     customer_id = Column(
-        Integer, Identity(cycle=True, always=True), primary_key=True
+        Integer, Identity(always=True), primary_key=True
     )
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
-    email_address = Column(String, nullable = False)
+    email_address = Column(String, nullable=False)
+    
     orders = relationship(
-        "orders",
-        back_populates="customers",
+        "Order",
+        back_populates="customer",
         cascade="all, delete-orphan",
     )
 
-class orders(Base):
-  __tablename__ = "orders"
-  order_id = Column(
-        Integer, Identity(cycle=True, always=True), primary_key=True
+class Order(Base):
+    __tablename__ = "orders"
+    
+    order_id = Column(
+        Integer, Identity(always=True), primary_key=True
     )
-  customer_id = Column(
+    customer_id = Column(
         Integer,
         ForeignKey("customers.customer_id", ondelete="CASCADE"),
-        nullable = False
+        nullable=False
     )
-  order_date =  Column(
-        DateTime(timezone=True)
+    order_date = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
     )
-  customers = relationship(
-        "customers", back_populates="orders"
+    
+    customer = relationship(
+        "Customer", 
+        back_populates="orders"
     )
 
-class products(Base):
-  __tablename__ = "products"
-  product_id = Column(
-        Integer, Identity(cycle=True, always=True), primary_key=True
+class Product(Base):
+    __tablename__ = "products"
+    
+    product_id = Column(
+        Integer, Identity(always=True), primary_key=True
     )
-  product_name = Column(
+    product_name = Column(
         String, nullable=False
-        )
-  description = Column(Text)
-  price = Column(Float, nullable=False)
+    )
+    description = Column(Text)
+    price = Column(Float, nullable=False)
 ```
 
-With these classes in `models.py`, We have created the following objects: `customers`, `orders` and `products`. 
+With these classes in `models.py`, We have created the following objects: `Customer`, `Order` and `Product`. 
 
-### `customers`:
+### `Customer`:
 
 This object describes the attributes of the customers. The `customer_id` column is the primary key of the table, and we initialize it as a serialized integer. We have added some additional parameters to the column (which also apply to the primary keys of every other table). 
 
 - `always=True` means the identity is always generated (even if a value is provided)
-- `cycle=True` means the sequence will restart from the beginning when it reaches its maximum value
 
 `first_name`,`last_name` and `email_address` are string columns that cannot be null, and need to be present in the data. This code snippet:
 
 ```python
-orders = relationship(
-        "orders",
-        back_populates="customers",
+    orders = relationship(
+        "Order",
+        back_populates="customer",
         cascade="all, delete-orphan",
     )
 ```
@@ -397,7 +402,7 @@ establishes a one-to-many relationship between `customers` and `orders`.
 
 The `cascade` behavior (`"all", "delete-orphan"`) means that when a instance of `customer` is deleted, all the associated `orders` (Orders that used the ID of the deleted customer as a foreign key) will also be deleted, and these changes will cascade downwards to any future child table of the `orders` table. 
 
-### `orders`:
+### `Order`:
 
 This object describes the attributes of each individual order. `order_id` is the primary key of this table. We designate the `customer_id` column as a foreign key from the `customers` table with this code snippet:
 
@@ -405,20 +410,22 @@ This object describes the attributes of each individual order. `order_id` is the
   customer_id = Column(
         Integer,
         ForeignKey("customers.customer_id", ondelete="CASCADE"),
+        nullable=False
     )
 ```
 
-This ensures that each order needs to have an association with an existing `customer_id` value. Orders that aren't associated with any customers, or are associated with non-existent customers, will not be possible to add to this table.
+The foreign key enforces referential integrity, while `nullable=False` ensures that each order must be associated with a customer. Orders that are associated with non-existent customers, or have no customer at all, will not be possible.
 
 We also establish a many-to-one relationship between `orders` and `customers` using the following code snippet:
 
 ```python
-  customers = relationship(
-        "customers", back_populates="orders"
+  customer = relationship(
+        "Customer", 
+        back_populates="orders"
     )
 ```
 
-### `products`:
+### `Product`:
 
 This object describes the attributes of each individual product. `product_id` is the primary key of this table, and this table does not have any relationships with any other tables yet. This data model is currently incomplete, but it is a great starting point at which to begin the development and migration of our data model.
 
@@ -675,23 +682,23 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
     op.create_table('customers',
-    sa.Column('customer_id', sa.Integer(), sa.Identity(always=True, cycle=True), nullable=False),
+    sa.Column('customer_id', sa.Integer(), sa.Identity(always=True), nullable=False),
     sa.Column('first_name', sa.String(), nullable=False),
     sa.Column('last_name', sa.String(), nullable=False),
     sa.Column('email_address', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('customer_id')
     )
     op.create_table('products',
-    sa.Column('product_id', sa.Integer(), sa.Identity(always=True, cycle=True), nullable=False),
+    sa.Column('product_id', sa.Integer(), sa.Identity(always=True), nullable=False),
     sa.Column('product_name', sa.String(), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('price', sa.Float(), nullable=False),
     sa.PrimaryKeyConstraint('product_id')
     )
     op.create_table('orders',
-    sa.Column('order_id', sa.Integer(), sa.Identity(always=True, cycle=True), nullable=False),
+    sa.Column('order_id', sa.Integer(), sa.Identity(always=True), nullable=False),
     sa.Column('customer_id', sa.Integer(), nullable=False),
-    sa.Column('order_date', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('order_date', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['customer_id'], ['customers.customer_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('order_id')
     )
@@ -704,6 +711,7 @@ def downgrade() -> None:
     op.drop_table('products')
     op.drop_table('customers')
     # ### end Alembic commands ###
+
 ```
 
 We can see that a migration script has been generated, with an upgrade and a downgrade parameter. Alembic has compared our target metadata against the database, and has generated a migration script complete with the operations needed to upgrade our database to the state defined by our ORM.
@@ -777,6 +785,7 @@ Alembic works through the migration scripts in the `versions` directory, startin
 This is a great first step towards building a comprehensive data model, but there is a long way to go before we can consider migrating our data model from a development environment to a production environment! In subsequent blog posts, we will cover the following: 
 
 - Updating our data model with more tables and relationships to create a proper e-commerce database schema.
+- Using an Async engine for asynchronous database connections
 - Using the `alembic_utils` library to incorporate views, functions and triggers into the version control system.
 - Configuring Alembic to connect to a production environment, and seamlessly bring the production environment's schema up-to-date with our final revision.
 
