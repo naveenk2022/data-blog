@@ -1,8 +1,8 @@
 ---
-title: "Expanding Data Models with Alembic."
+title: "Data Model Version Control with Alembic."
 date: "2026-01-13"
 tags: ['Python', 'PostgreSQL', 'SQLAlchemy', 'Alembic', 'ORM', 'Database Design', 'Database Migrations', 'Tutorial']
-description: "Expanding relational data models with Entity types using Alembic and Alembic-Utils."
+description: "Developing data models with version control using Alembic and Alembic-Utils."
 author: ["Naveen Kannan"]
 weight: 10
 draft: true
@@ -23,22 +23,28 @@ params:
 
 # Introduction
 
-As the scope of a data model and it's downstream APIs and front-end tools changes, it will need to be updated and expanded to account for this new scope.
+As the scope of a data model (and by extension, it's downstream APIs) changes, it will need to be updated and expanded to account for this new scope.
 
 When changes are made to a data model, especially to a model that is split across development and production environments, schema drift becomes a constant problem that looms in the background.
 
-While typical software development is subsumed to a version controlled system as a standard, data model development is typically not submitted to a robust version control system. As different team members collaborate on a data model split across different environments,  the possibility of schema drift gradually grows when changes to the data model are not tracked in a central repository.
+Typical coding workflows are managed by version control as an industry standard. Data model development, however, is typically not submitted to a version control system. As different team members collaborate on a data model split across different environments, the possibility of schema drift gradually grows in an environment where the data model is not tracked in a central repository.
 
-In this blog post, we will pick up from the progress in the previous entry in this series and continue to develop our data model. We will incorporate PostgreSQL entity types such as functions, views, materialized views, triggers, and policies into our data model, and commit all of them to version control.
+In this blog post, we will pick up from the progress in the previous entry in this series and continue to develop our data model. We will incorporate PostgreSQL entity types such as functions, views, materialized views, triggers, and policies into our data model, and commit all of these changes to version control.
 
 ## What we've covered
 
-In our previous blog post:
+In our [previous blog post:](posts/sqlalchemy_data_modeling)
 
-- We used SQLAlchemy to create the first iteration of a rudimentary e-commerce data model.
-- We used Alembic to migrate this rudimentary data model to our fresh development database.
+- We used SQLAlchemy to create the first iteration of a rudimentary data model.
+- We configured Alembic to connect to a fresh development database and migrated our rudimentary data model. 
 
-## Brief Recap
+## What we'll cover 
+
+Lorem Ipsum
+
+## Brief Concept Recap
+
+I'll briefly cover the concepts we went over in the previous blog post.
 
 ### SQLAlchemy
 
