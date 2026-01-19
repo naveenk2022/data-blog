@@ -56,17 +56,17 @@ A basic Ansible environment has the following three components:
     align=center
 >}}
 
-I have a blog post detailing the basics of Ansible and it's relevance in a computing cluster [here!](https://naveenkannan.netlify.app/posts/ansible_cluster/ansible_cluster_config).
+I have a blog post detailing the basics of Ansible and it's relevance in a computing cluster [here!](posts/ansible_cluster_config).
 
 # Prerequisites for this blog post
 
--   An installation of Ansible (In a [previous post](https://naveenkannan.netlify.app/posts/ansible_cluster/ansible_cluster_config), I set up Ansible in a Docker container, minimizing the overhead on the actual cluster nodes).
+-   An installation of Ansible (In a [previous post](posts/ansible_cluster_config), I set up Ansible in a Docker container, minimizing the overhead on the actual cluster nodes).
 
 -   Password-less SSH connections set up between each node and the node (or container) you are running Ansible from.
 
 -   The inventory file, defined at `/etc/Ansible/hosts`.
 
--   An installation of Hadoop, with HDFS, YARN, MapReduce and Spark configured and running. [This post covers the basic overview of the installation and configuration of Hadoop and Spark.](https://naveenkannan.netlify.app/posts/hadoop_spark/hadoop_spark)
+-   An installation of Hadoop, with HDFS, YARN, MapReduce and Spark configured and running. [This post covers the basic overview of the installation and configuration of Hadoop and Spark.](posts/hadoop_spark)
 
 I used Ansible from a Docker container to configure a 4 node cluster. The cluster inventory file is in the `INI` format as follows:
 
