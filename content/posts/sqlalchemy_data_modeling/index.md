@@ -1,6 +1,6 @@
 ---
 title: "Relational Data Model design with SQLAlchemy."
-date: "2026-01-13"
+date: "2026-01-26"
 tags: ['Python', 'PostgreSQL', 'SQLAlchemy', 'Alembic', 'ORM', 'Database Design', 'Database Migrations', 'Tutorial']
 description: "An introduction to using SQLAlchemy and Alembic for relational data model design. "
 author: ["Naveen Kannan"]
