@@ -1,6 +1,6 @@
 ---
 title: "Data Model Version Control with Alembic."
-date: "2026-01-13"
+date: "2026-01-26"
 tags: ['Python', 'PostgreSQL', 'SQLAlchemy', 'Alembic', 'ORM', 'Database Design', 'Database Migrations', 'Tutorial']
 description: "Developing version-controlled relational data models using Alembic."
 author: ["Naveen Kannan"]
