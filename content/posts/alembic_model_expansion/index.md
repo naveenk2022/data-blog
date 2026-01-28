@@ -115,9 +115,9 @@ class Product(Base):
 ```
 
 >[!NOTE]
->We generated an initial migration, but right now, this migration environment lives locally. We need to push this to a GitHub repository! 
+>We generated an initial migration, but right now, this migration environment lives locally. We need to push this to a GitHub repository!
 >
->The data model at the end of the first blog post has been pushed to GitHub and can be [found here](https://github.com/naveenk2022/commerce_data_model). 
+>The data model at the end of the first blog post has been pushed to GitHub and can be [found here](https://github.com/naveenk2022/commerce_data_model).
 >
 > This repository will evolve along with the blog! Every change we make moving forward will be committed to version control.
 
@@ -326,7 +326,7 @@ By wiring these connections, we abstract away the many-to-many relationship betw
 
 # Auto-generating migrations
 
-We now have a end state of our data model defined in the ORM. To generate a migration, we need to allow Alembic to compare the current state of the database against the ORM, and have it automatically generate a migration script that we **must review** before applying. 
+We now have a end state of our data model defined in the ORM. To generate a migration, we need to allow Alembic to compare the current state of the database against the ORM, and have it automatically generate a migration script that we **must review** before applying.
 
 We configured and set up Alembic in the previous blog post, so this time, we just need to run the following command:
 
@@ -348,9 +348,9 @@ The `versions` directory now contains two migration scripts! One is the migratio
 >
 >The reason for this change is that I created a new revision script for the initial migration, and the revision ID is randomly generated!
 >
-> Other aspects of the migration script are otherwise exactly the same, and the scripts are otherwise functionally identical. 
+> Other aspects of the migration script are otherwise exactly the same, and the scripts are otherwise functionally identical.
 
-The newly generated migration should have the following content: 
+The newly generated migration should have the following content:
 
 ```python
 """Created OrderProduct as an association table to track Order-Product association.
@@ -394,22 +394,44 @@ def downgrade() -> None:
 
 # Reviewing the auto-generated migration
 
-Remember that Alembic's documentation states,  
+Remember that Alembic's documentation states,
 > It is **always** necessary to manually review and correct the **candidate migrations** that autogenerate produces.
 
-Reviewing our migration script, it looks like: 
+Reviewing our migration script, it looks like:
 
-- Alembic has created a table called `order_products`. 
-- `order_id` and `product_id` are both **foreign keys**. They are the primary keys from the tables `orders` and `products` respectively. 
+- Alembic has created a table called `order_products`.
+- `order_id` and `product_id` are both **foreign keys**. They are the primary keys from the tables `orders` and `products` respectively.
 - `order_id` and `product_id` are also **primary keys** for the `order_products` table.
 - `order_products` has a column called `product_count`, with a default value of 1.
 
 >[!TIP]
 >`order_id` and `product_id` are both selected as primary keys to ensure that duplicate rows won’t be persisted within the `order_products` regardless of issues on the application side.
 
-This migration script looks good! We can go ahead and apply it to the database. 
+This migration script looks good! We can go ahead and apply it to the database.
 
-# Applying the migration 
+>[!NOTE] Why does the migration script look so sparse compared to the complex ORM relationships?
+> **`Order`**:
+> ```
+> products = relationship(
+>         "OrderProduct",
+>         back_populates="order",
+>         cascade="all, delete-orphan",
+>     )
+> ```
+> This code defines the behavior within the **ORM**, and will become relevant when you interact with the database via SQLAlchemy.
+> It defines the behaviour of these classes within Python and also documents the relationship on a conceptual level.
+> It **doesn't create anything within the database**.
+>
+> On the database level, it is really straightforward to build this relationship,
+> which is why the migration script seems so sparse in comparison.
+> Within the migration script, on the database level, we're just creating `order_products`
+> as a table with foreign keys pointing to the parent entity tables.
+> The relational aspect of the data model is much lower level than the conceptual data model, which is what we define in the ORM.
+>
+> The ORM helps us build a conceptual data model with rich, complex relationships as seen in our code.
+> Alembic reads the ORM and generates migrations to create a lower-level relational data model **from** the ORM.
+
+# Applying the migration
 
 We can then apply the migration script with the command:
 
@@ -433,30 +455,30 @@ Connecting to the database shows the following ERD:
     align=center
 >}}
 
-We've successfully created the association table, and we have built an indirect **many-to-many** association between `Orders` and `Products`! When we examine the contents of the `alembic_version` table, it now contains a single row with the value `960969e75871`, which is the revision it has applied. It applied this one specifically because we had alembic upgrade to the `head` version, which is the latest version. 
+We've successfully created the association table, and we have built an indirect **many-to-many** association between `Orders` and `Products`! When we examine the contents of the `alembic_version` table, it now contains a single row with the value `960969e75871`, which is the revision it has applied. It applied this one specifically because we had alembic upgrade to the `head` version, which is the latest version.
 
 # Committing to GitHub
 
-At this point, we've made changes to `models.py` and we have a new migration script called `960969e75871_created_orderproduct_as_an_association_.py`. Both these changes need to be pushed GitHub. I recommend committing and pushing these changes as a single commit with the same commit message that we used for auto-generating a migration script. 
+At this point, we've made changes to `models.py` and we have a new migration script called `960969e75871_created_orderproduct_as_an_association_.py`. Both these changes need to be pushed GitHub. I recommend committing and pushing these changes as a single commit with the same commit message that we used for auto-generating a migration script.
 
 Remember to always commit migration scripts **together with** model changes.
 
 # Further iterating
 
-Let's expand this data model more. A great addition to this data model would be the ability to create and assign tags to products for greater searchability. 
+Let's expand this data model more. A great addition to this data model would be the ability to create and assign tags to products for greater searchability.
 
-To start with, these tags will be really simple. A tag will be a text-based descriptor that can be applied to any product. For example, a laptop as a product might have a tag called 'computer' assigned to it. 
+To start with, these tags will be really simple. A tag will be a text-based descriptor that can be applied to any product. For example, a laptop as a product might have a tag called 'computer' assigned to it.
 
-To reflect this, we will create a table containing tags, and build a **many-to-many** relationship between products and tags. Each product can have multiple tags, and each tag can be assigned to multiple products. For this, like before, we will build an association table. 
+To reflect this, we will create a table containing tags, and build a **many-to-many** relationship between products and tags. Each product can have multiple tags, and each tag can be assigned to multiple products. For this, like before, we will build an association table.
 
 We will do the following:
 - Create a class for `Tags` in the ORM
 - Create an association table called `product_tags` to associate products and tags
-- Update the relationships for `Products` to reflect the new relationship to the `Tags` class.  
+- Update the relationships for `Products` to reflect the new relationship to the `Tags` class.
 
 >[!TIP]
-> In the interest of brevity, this section won't be as thoroughly explanatory as the section for creating `OrderProducts`. 
-> This process is very similar to what we've covered thus far! 
+> In the interest of brevity, this section won't be as thoroughly explanatory as the section for creating `OrderProducts`.
+> This process is very similar to what we've covered thus far!
 
 ## Creating a `Tags` class
 
@@ -575,13 +597,17 @@ class Tag(Base):
 >[!NOTE]
 > The `product_tags` implementation here is different from the `OrderProducts` class.
 >
-> This is because `OrderProducts` is an **association object pattern**. 
-> We created the class in that way because the table contains *additional columns* beyond the foreign keys to the entity tables, 
-> and we mapped a full ORM class **directly** to the association table. 
+> This is because `product_tags` is a straightforward, simple association table,
+> which is what the documentation for SQLAlchemy says to use when your association table has no metadata.
 >
-> In the case of `product_tags`, there will be no metadata in the `product_tags` table beyond the foreign keys, so we create 
-> the association table **directly** without mapping a class, and we then use SQLAlchemy's `secondary` table pattern
-> instead of mapping a dedicated ORM class.
+> This `secondary` table pattern is only usable when all you have in the table are foreign keys.
+> `product_tags` has no attributes apart from its foreign keys, so we use the association table with the `secondary` table pattern.
+>
+> The reason `OrderProducts` was mapped as a class was because we have additional metadata beyond just the foreign keys in that table.
+>
+> `OrderProducts` goes from just a simple association table to a full entity in it's own right when you add even a single extra column beyond the foreign keys.
+> The recommended approach for adding metadata to an association table is to map the association table directly to a full class.
+
 
 ## Generating a migration
 
@@ -593,7 +619,7 @@ alembic revision --autogenerate -m "Created a table for tags, and created a tabl
 
 ## Reviewing the migration script
 
-The contents of the migration script are: 
+The contents of the migration script are:
 
 ```python
 """Created a table for tags, and created a table called product_tags as an association table between products and tags.
@@ -641,7 +667,7 @@ def downgrade() -> None:
     # ### end Alembic commands ###
 ```
 
-This migration script (with the revision ID `6e58a26e5c70`) looks good! 
+This migration script (with the revision ID `6e58a26e5c70`) looks good!
 
 You should now have three scripts inside `alembic/versions`.
 
@@ -668,13 +694,13 @@ Connecting to the database shows the following ERD:
     align=center
 >}}
 
-We've successfully built a connection between Products and Tags via an association table! 
+We've successfully built a connection between Products and Tags via an association table!
 
-Browsing through `alembic/versions` should give us an idea of the growth of our data model and how it evolves to match the change in scope of our e-commerce workflow. With these three migration scripts, we've gone from a rudimentary data model to a more complex one, while being able to track how the data model has evolved from its conception. 
+Browsing through `alembic/versions` should give us an idea of the growth of our data model and how it evolves to match the change in scope of our e-commerce workflow. With these three migration scripts, we've gone from a rudimentary data model to a more complex one, while being able to track how the data model has evolved from its conception.
 
 # Next Steps
 
-In subsequent blog posts, we will cover: 
+In subsequent blog posts, we will cover:
 
 - Using an Async engine for asynchronous database connections
 - Using the `alembic_utils` library to incorporate views, functions and triggers into the version control system.
