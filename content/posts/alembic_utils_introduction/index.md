@@ -49,3 +49,47 @@ In [part 2:](posts/alembic_model_expansion)
     caption="The data model at the end of the previous post."
     align=center
 >}}
+
+## What we'll cover
+
+In this blog post, we will cover how you can install Alembic Utils and begin incorporating entity types into the commerce data model. 
+
+We will do the following:
+- Update the virtual environment with Alembic Utils.
+- Configure Alembic to use the newly installed extension.
+- Create a function and a view in the ORM.
+- Register these entities with Alembic Utils.
+- Autogenerate a migration script with Alembic that we will review, and then apply the revisions.
+
+# Getting started
+
+[Alembic Utils](https://github.com/olirice/alembic_utils) is an Alembic/SQLAlchemy extension written in Python with an MIT license. 
+
+## Installing Alembic Utils
+
+In [part 1](posts/sqlalchemy_data_modeling/#prerequisites) of this series, we created a micromamba virtual environment called `data_model` with SQLAlchemy and Alembic installed. 
+
+We will activate this virtual envrionment and then install Alembic Utils.
+
+First, activate the virtual environment. 
+
+```bash
+micromamba activate data_model
+```
+
+Then, install the Alembic Utils extension. 
+
+```bash
+pip install alembic_utils
+```
+
+Export the new environment details using the following command:
+
+```bash
+micromamba env export > environment.yaml
+```
+
+> [!NOTE]
+> Updating your `environment.yaml` file any time your dependencies change is good practice.
+> 
+> It makes your virtual environment reproducible and accessible! 
