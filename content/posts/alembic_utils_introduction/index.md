@@ -61,11 +61,7 @@ We will do the following:
 - Register these entities with Alembic Utils.
 - Autogenerate a migration script with Alembic that we will review, and then apply the revisions.
 
-# Getting started
-
-[Alembic Utils](https://github.com/olirice/alembic_utils) is an Alembic/SQLAlchemy extension written in Python with an MIT license. 
-
-## Installing Alembic Utils
+# Installing Alembic Utils
 
 In [part 1](posts/sqlalchemy_data_modeling/#prerequisites) of this series, we created a micromamba virtual environment called `data_model` with SQLAlchemy and Alembic installed. 
 
@@ -93,6 +89,8 @@ micromamba env export > environment.yaml
 > Updating your `environment.yaml` file any time your dependencies change is good practice.
 > 
 > It makes your virtual environment reproducible and accessible! 
+
+# Adding a view to the database
 
 ## Creating a View in the ORM
 
@@ -335,3 +333,11 @@ Connecting to the database shows us that the view has been migrated to the datab
     caption="The newly migrated view."
     align=center
 >}}
+
+# Expanding the data model's scope
+
+We would like to now expand the data model to track when the attributes of a particular product have been edited. To do this, we will do the following:
+
+- Add a `last_updated` timestamp column to the `products` table. 
+- Create a function that will update the `last_edited` column of a table
+- Create a trigger that will call the aforementioned function whenever a row of `products` is edited.
