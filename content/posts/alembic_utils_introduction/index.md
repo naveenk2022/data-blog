@@ -73,7 +73,7 @@ First, activate the virtual environment.
 micromamba activate data_model
 ```
 
-Then, install the Alembic Utils extension. 
+Then, install the Alembic Utils extension within the environment. The documentation recommends using `pip`.
 
 ```bash
 pip install alembic_utils
@@ -334,10 +334,473 @@ Connecting to the database shows us that the view has been migrated to the datab
     align=center
 >}}
 
-# Expanding the data model's scope
+# Expanding the data model's scope 
 
 We would like to now expand the data model to track when the attributes of a particular product have been edited. To do this, we will do the following:
 
-- Add a `last_updated` timestamp column to the `products` table. 
-- Create a function that will update the `last_edited` column of a table
+- Add a `last_edited` timestamp column to the `products` table. 
+- Create a function that will update the `last_edited` column of a table.
 - Create a trigger that will call the aforementioned function whenever a row of `products` is edited.
+
+## Adding a timestamp column to the `products` table
+
+Amend the data model in `models.py` to have a `last_edited` timestamp column.
+
+```python {hl_lines=["94-96"]}
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Float,
+    ForeignKey,
+    Identity,
+    Text,
+    DateTime,
+    Table,
+)
+from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.sql import func
+
+Base = declarative_base()
+
+
+class Customer(Base):
+    __tablename__ = "customers"
+
+    customer_id = Column(Integer, Identity(always=True), primary_key=True)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    email_address = Column(String, nullable=False)
+
+    orders = relationship(
+        "Order",
+        back_populates="customer",
+        cascade="all, delete-orphan",
+    )
+
+
+class OrderProduct(Base):
+    __tablename__ = "order_products"
+    order_id = Column(
+        Integer,
+        ForeignKey("orders.order_id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+    product_id = Column(
+        Integer,
+        ForeignKey("products.product_id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+    product_count = Column(Integer, server_default="1", nullable=False)
+    order = relationship("Order", back_populates="products")
+    product = relationship("Product", back_populates="orders")
+
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    order_id = Column(Integer, Identity(always=True), primary_key=True)
+    customer_id = Column(
+        Integer, ForeignKey("customers.customer_id", ondelete="CASCADE"), nullable=False
+    )
+    order_date = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    customer = relationship(
+        "Customer",
+        back_populates="orders",
+    )
+    products = relationship(
+        "OrderProduct",
+        back_populates="order",
+        cascade="all, delete-orphan",
+    )
+
+
+product_tags = Table(
+    "product_tags",
+    Base.metadata,
+    Column(
+        "product_id",
+        ForeignKey("products.product_id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column("tag_id", ForeignKey("tags.tag_id", ondelete="CASCADE"), primary_key=True),
+)
+
+
+class Product(Base):
+    __tablename__ = "products"
+
+    product_id = Column(Integer, Identity(always=True), primary_key=True)
+    product_name = Column(String, nullable=False)
+    description = Column(Text)
+    price = Column(Float, nullable=False)
+    last_edited = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+    orders = relationship(
+        "OrderProduct",
+        back_populates="product",
+        cascade="all, delete-orphan",
+    )
+    tags = relationship("Tag", secondary=product_tags, back_populates="products")
+
+
+class Tag(Base):
+    __tablename__ = "tags"
+
+    tag_id = Column(Integer, Identity(always=True), primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    products = relationship("Product", secondary=product_tags, back_populates="tags")
+```
+> [!NOTE]
+> The `onupdate=func.now()` parameter for `last_edited` will update the column when changes are issued through the ORM.
+>
+> To guarantee database level correctness, we will need to create a trigger as well to guarantee data accuracy
+> even when changes come from outside of any applications that use the ORM.
+
+Generate a revision with `alembic --autogenerate`.
+
+```python
+"""Added a column to products to track timestamps for row-level edits.
+
+Revision ID: eebe110ef9d2
+Revises: e2ba9d70fc4d
+Create Date: 2026-02-08 16:29:55.536261
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+
+
+# revision identifiers, used by Alembic.
+revision: str = 'eebe110ef9d2'
+down_revision: Union[str, None] = 'e2ba9d70fc4d'
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.add_column('products', sa.Column('last_edited', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True))
+    # ### end Alembic commands ###
+
+
+def downgrade() -> None:
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_column('products', 'last_edited')
+    # ### end Alembic commands ###
+```
+
+We will then apply this migration with the `alembic upgrade head` command.
+
+## Creating a function to update the `last_edited` column of `products`
+
+Create a script called `db_functions.py` in the project root. 
+
+`db_functions.py`:
+
+```python
+from alembic_utils.pg_function import PGFunction
+
+## Creating a function that updates the `last_edited` column of a table
+timestamp_update_on_edit = PGFunction(
+    schema="public",
+    signature="timestamp_update_on_edit()",
+    definition="""
+RETURNS TRIGGER AS $$ BEGIN NEW.last_edited = now();
+RETURN NEW;
+END;
+$$ language PLPGSQL
+""",
+)
+```
+
+With this code, we create a `PGFunction` class object that defines a PostgreSQL function called `timestamp_update_on_edit()`. When this function is called, the `last_edited` column is updated to have the time and date of the point in time when it was called.
+
+## Creating a trigger to call the timestamp function on row edits
+
+Create a script called `db_triggers.py` in the project root.
+
+`db_triggers.py`:
+
+```python
+from alembic_utils.pg_trigger import PGTrigger
+
+## Creating a trigger to apply `timestamp_update_on_edit()` to `products` on a row being updated
+timestamp_update_apply_products_trigger = PGTrigger(
+    schema="public",
+    signature="timestamp_update_apply_products_trigger",
+    on_entity="public.products",
+    is_constraint=False,
+    definition="""
+BEFORE 
+UPDATE 
+  on products FOR EACH ROW EXECUTE FUNCTION timestamp_update_on_edit()
+""",
+)
+```
+
+This code defines a `PGTrigger` class object with the signature `timestamp_update_apply_products_trigger`. When a row is updated on `products`, this trigger is activated and calls the `timestamp_update_on_edit()` function, which will update the `last_edited` column.
+
+>[!NOTE]
+> In the ORM, as part of the definition of the `Product` object, the `onupdate=func.now()` parameter 
+> updates the `last_edited` column when changes are issued through the ORM. 
+>
+> When we create a trigger to perform the timestamp update for `products` in the database upon a row being edited, 
+> this guarantees correctness on a database level even when the changes come outside of the application. 
+
+## Registering the newly defined entities
+
+We will update `alembic/env.py` to then register our newly created entities with alembic_utils. 
+
+`alembic/env.py`:
+
+```python {hl_lines=["9-18"]}
+from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
+from alembic_utils.replaceable_entity import register_entities
+from alembic import context
+from models import Base
+from db_views import order_line_items
+from db_functions import timestamp_update_on_edit
+from db_triggers import timestamp_update_apply_products_trigger
+
+register_entities(
+    [
+        order_line_items,
+        timestamp_update_on_edit,
+        timestamp_update_apply_products_trigger,
+    ]
+)
+
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+# from myapp import mymodel
+# target_metadata = mymodel.Base.metadata
+target_metadata = Base.metadata
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+
+def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode.
+
+    This configures the context with just a URL
+    and not an Engine, though an Engine is acceptable
+    here as well.  By skipping the Engine creation
+    we don't even need a DBAPI to be available.
+
+    Calls to context.execute() here emit the given string to the
+    script output.
+
+    """
+    url = config.get_main_option("sqlalchemy.url")
+    context.configure(
+        url=url,
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode.
+
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+
+    """
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
+
+    with connectable.connect() as connection:
+        context.configure(connection=connection, target_metadata=target_metadata)
+
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()
+
+```
+
+With this update, our newly created function and trigger have been registered. They should now be detected when using `autogenerate`.
+
+## Autogenerating and applying a revision to migrate the newly added entities
+
+Create a revision script with:
+
+```bash
+alembic revision --autogenerate -m "Created a function to update the last_edited timestamp column, and created a trigger to call this function for the products table."
+```
+
+This should generate a revision file with the following content:
+
+```python
+"""Created a function to update the last_edited timestamp column, and created a trigger to call this function for the products table.
+
+Revision ID: 172f9e67a364
+Revises: eebe110ef9d2
+Create Date: 2026-02-08 16:41:47.178179
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+from alembic_utils.pg_function import PGFunction
+from sqlalchemy import text as sql_text
+from alembic_utils.pg_trigger import PGTrigger
+from sqlalchemy import text as sql_text
+
+# revision identifiers, used by Alembic.
+revision: str = '172f9e67a364'
+down_revision: Union[str, None] = 'eebe110ef9d2'
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    # ### commands auto generated by Alembic - please adjust! ###
+    public_timestamp_update_on_edit = PGFunction(
+        schema="public",
+        signature="timestamp_update_on_edit()",
+        definition='RETURNS TRIGGER AS $$ BEGIN NEW.last_edited = now();\nRETURN NEW;\nEND;\n$$ language PLPGSQL'
+    )
+    op.create_entity(public_timestamp_update_on_edit)
+
+    public_products_timestamp_update_apply_products_trigger = PGTrigger(
+        schema="public",
+        signature="timestamp_update_apply_products_trigger",
+        on_entity="public.products",
+        is_constraint=False,
+        definition='BEFORE \nUPDATE \n  on products FOR EACH ROW EXECUTE FUNCTION timestamp_update_on_edit()'
+    )
+    op.create_entity(public_products_timestamp_update_apply_products_trigger)
+
+    # ### end Alembic commands ###
+
+
+def downgrade() -> None:
+    # ### commands auto generated by Alembic - please adjust! ###
+    public_products_timestamp_update_apply_products_trigger = PGTrigger(
+        schema="public",
+        signature="timestamp_update_apply_products_trigger",
+        on_entity="public.products",
+        is_constraint=False,
+        definition='BEFORE \nUPDATE \n  on products FOR EACH ROW EXECUTE FUNCTION timestamp_update_on_edit()'
+    )
+    op.drop_entity(public_products_timestamp_update_apply_products_trigger)
+
+    public_timestamp_update_on_edit = PGFunction(
+        schema="public",
+        signature="timestamp_update_on_edit()",
+        definition='RETURNS TRIGGER AS $$ BEGIN NEW.last_edited = now();\nRETURN NEW;\nEND;\n$$ language PLPGSQL'
+    )
+    op.drop_entity(public_timestamp_update_on_edit)
+
+    # ### end Alembic commands ###
+```
+The migration script should create the function and the trigger that we defined in the ORM within the database. After reviewing it, we apply the migration with the command `alembic upgrade head`.
+
+Once these changes have been migrated, run the following SQL code in the database to get the triggers associated with the `products` table.
+
+```sql
+SELECT 
+    tgname AS trigger_name
+FROM 
+    pg_trigger
+WHERE
+    tgrelid = 'public.products'::regclass
+ORDER BY
+    trigger_name;
+```
+
+This should give you the output:
+
+```
+RI_ConstraintTrigger_a_16447
+RI_ConstraintTrigger_a_16448
+RI_ConstraintTrigger_a_16471
+RI_ConstraintTrigger_a_16472
+timestamp_update_apply_products_trigger
+```
+
+Indicating the trigger has been successfully migrated. Run the following code to get the functions associated with the `public` schema:
+
+```sql
+SELECT
+    routine_name
+FROM 
+    information_schema.routines
+WHERE 
+    routine_type = 'FUNCTION'
+AND
+    routine_schema = 'public';
+```
+
+This should give you the output:
+
+```
+routine_name
+timestamp_update_on_edit
+```
+
+showing that our new function has been migrated to the database as well! 
+
+We've successfully added a view, a function and a trigger to our database via migrations applied from our SQLAlchemy ORM. 
+
+Browsing through `alembic/versions` should give us an idea of the growth of our data model and how it evolves to match the change in scope of our e-commerce workflow. 
+
+```bash
+alembic/versions/
+├── 172f9e67a364_created_a_function_to_update_the_last_.py
+├── 6e58a26e5c70_created_a_table_for_tags_and_created_a_.py
+├── 960969e75871_created_orderproduct_as_an_association_.py
+├── a0cf7f5d705d_initial_commit_created_customers_orders_.py
+├── e2ba9d70fc4d_created_a_view_called_order_line_items_.py
+└── eebe110ef9d2_added_a_column_to_products_to_track_.py
+```
+
+# Next Steps
+
+In subsequent blog posts, we will cover: 
+
+- Applying our migrations to a production environment
+- Using the ORM as a module when coding a FastAPI server
+
+# References
+
+- The [repo for Alembic Utils.](https://github.com/olirice/alembic_utils)
+- The [documentation for Alembic Utils.](https://olirice.github.io/alembic_utils/)
