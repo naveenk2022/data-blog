@@ -3,6 +3,7 @@ languageCode: en-us
 title: Naveen Kannan
 theme: ["hugo-admonitions", "hugo-PaperMod"]
 params:
+  comments: true
   profileMode:
     enabled: true
     title: "Database Engineer"
@@ -11,7 +12,6 @@ params:
     imageWidth: 196 # custom size
     imageHeight: 313 # custom size
   ShowReadingTime: true
-  comments: true
 
   socialIcons: # optional
     - name: github
