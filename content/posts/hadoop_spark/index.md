@@ -12,11 +12,12 @@ cover:
   image: "hadoop_logo.png"
   alt: "<alt text>"
   caption: "The Hadoop logo."
-  relative: false 
+  relative: false
   hidden: false
   hiddenInList: true
   hiddenInSingle: false
 params:
+  comments: true
   ShowCodeCopyButtons: true
   ShowReadingTime: true
 ---
@@ -78,8 +79,8 @@ Reducing:
 
 Hadoop Common provides essential fundamental libraries and utilities for different components within the Hadoop architecture. It serves as a shared resource that supports the entire Hadoop framework.
 
-{{< figure 
-    src="hadoop_architecture.png" 
+{{< figure
+    src="hadoop_architecture.png"
     caption="A diagrammatic representation of the Hadoop architecture across a computing cluster with a Master Node and 3 Slave Nodes."
     align=center
 >}}
@@ -112,7 +113,7 @@ Pro-tip! On my RHEL 8 head node, I ran into a lot of erros from using `pdsh` sin
 
 Update your `.bashrc` or `.bash_profile` file with the following:
 
-```         
+```
 export PDSH_RCMD_TYPE=ssh
 ```
 

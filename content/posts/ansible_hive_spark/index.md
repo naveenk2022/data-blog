@@ -17,6 +17,7 @@ cover:
   hiddenInList: true
   hiddenInSingle: false
 params:
+  comments: true
   ShowCodeCopyButtons: true
   ShowReadingTime: true
 ---

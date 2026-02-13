@@ -12,11 +12,12 @@ cover:
   image: "docker_logo.jpg"
   alt: "<alt text>"
   caption: "The Docker logo."
-  relative: false 
+  relative: false
   hidden: false
   hiddenInList: true
   hiddenInSingle: false
 params:
+  comments: true
   ShowCodeCopyButtons: true
   ShowReadingTime: true
 ---
@@ -25,29 +26,29 @@ params:
 
 Docker is a container service that we have discussed previously in my blog posts.
 
-The default storage location for Docker is at `/var/lib/docker`. Speaking from experience, as images and containers are built over a period of time, especially if there are multiple users using the Docker service, the root filesystem can run into issues where the size of the Docker storage directory can cause potential out-of-space crises, and significantly deteriorate overall system performance. 
+The default storage location for Docker is at `/var/lib/docker`. Speaking from experience, as images and containers are built over a period of time, especially if there are multiple users using the Docker service, the root filesystem can run into issues where the size of the Docker storage directory can cause potential out-of-space crises, and significantly deteriorate overall system performance.
 
 In this blog post, we will look at transferring the Storage directory to another location. (In my case, I transferred it to a physical hard drive with expanded storage capacity).  It's an essential step to ensure that Docker operations continue to run smoothly and efficiently, particularly in production environments.
 
-# The process 
+# The process
 
-The storage transfer process will have the following steps: 
+The storage transfer process will have the following steps:
 
 -   Stopping the docker service.
 
--   Transferring the Docker storage files from `/var/lib/docker` to it's new location, while preserving the file's metadata. 
+-   Transferring the Docker storage files from `/var/lib/docker` to it's new location, while preserving the file's metadata.
 
--   Renaming the old storage so that Docker will not attempt to reuse it. 
+-   Renaming the old storage so that Docker will not attempt to reuse it.
 
--   Creating a config file `daemon.json` at `/etc/docker` in order to point the Docker service to the new storage directory. 
+-   Creating a config file `daemon.json` at `/etc/docker` in order to point the Docker service to the new storage directory.
 
 -   Modifying the systemctl service file in order for the Docker service to correctly identify the Docker daemon.**(NOTE: This may or may not be necessary. Explained with greater detail in it's relevant section.)**
 
--   Reloading the daemons and restarting the Docker service. 
+-   Reloading the daemons and restarting the Docker service.
 
 Note that these commands need to be run with elevated (superuser) privileges.
 
-## Stopping the Docker service. 
+## Stopping the Docker service.
 
 The Docker service can be stopped with the command:
 
@@ -57,9 +58,9 @@ systemctl stop docker
 
 Systemctl is a Linux command used for controlling and managing system services, including starting, stopping, enabling, and disabling them, among other tasks.
 
-## Transferring the Docker storage files from `/var/lib/docker` to it's new location, while preserving the file's metadata. 
+## Transferring the Docker storage files from `/var/lib/docker` to it's new location, while preserving the file's metadata.
 
-### Creating a new directory for the storage 
+### Creating a new directory for the storage
 
 ```bash
 mkdir /path/to/new/storage
@@ -67,11 +68,11 @@ mkdir /path/to/new/storage
 
 ### Copying the existing storage to the new location
 
-```bash 
+```bash
 rsync -aqxP /var/lib/docker /path/to/new/storage
 ```
 
-The `rsync` command is used to synchronize and copy files and directories from one location to another. It stands for remote sync, and is a file synchronization tool. 
+The `rsync` command is used to synchronize and copy files and directories from one location to another. It stands for remote sync, and is a file synchronization tool.
 
 `-aqxP`:These are the options and flags used with rsync.
 
@@ -91,7 +92,7 @@ mv /var/lib/docker /var/lib/docker.old
 
 ## Creating a `daemon.json` file at `/etc/docker`.
 
-This file will help point the Docker service to the new storage location. 
+This file will help point the Docker service to the new storage location.
 
 ```bash
 echo '{
@@ -101,25 +102,25 @@ echo '{
 
 ## Editing the systemctl file to allow Docker to connect to the Docker Daemon
 
-When I attempted to perform the storage transfer on my own, I originally did not have this step included. When restarting the Docker service, I got the following error whenever I attempted any Docker commands. 
+When I attempted to perform the storage transfer on my own, I originally did not have this step included. When restarting the Docker service, I got the following error whenever I attempted any Docker commands.
 
 ```bash
 Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
 ```
-The Docker daemon was very clearly running (by running `systemctl status docker`), but the `docker` cli was unable to connect to the socket file. 
+The Docker daemon was very clearly running (by running `systemctl status docker`), but the `docker` cli was unable to connect to the socket file.
 
-This was because I had restarted the Docker daemon as a service using the `systemctl` command. 
+This was because I had restarted the Docker daemon as a service using the `systemctl` command.
 
-I found my service file path from the output of `systemctl status docker`. 
+I found my service file path from the output of `systemctl status docker`.
 
-The following is the first two lines of the output produced by this command. 
+The following is the first two lines of the output produced by this command.
 
 ```bash
 ● docker.service - Docker Application Container Engine
    Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled; vendor preset: disabled)
 ```
 
-Edit this file at the specified location. 
+Edit this file at the specified location.
 
 The following was the content in the file on my system. Pay attention to the line that starts with `ExecStart=/usr/bin/dockerd`.
 
@@ -138,7 +139,7 @@ ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
 
 ```
 
-The `-H fd://` means the daemon is using a file descriptor managed by systemctl, without pointing towards the socket file at `/var/run/docker.sock`. 
+The `-H fd://` means the daemon is using a file descriptor managed by systemctl, without pointing towards the socket file at `/var/run/docker.sock`.
 
 Modify the line to look like this:
 
@@ -162,9 +163,9 @@ systemctl start docker
 
 ## Testing!
 
--   Run `docker image ls` and `docker ps -a` commands to see if the images and containers have been succesfully transferred, and Docker is able to see them at the new location. 
+-   Run `docker image ls` and `docker ps -a` commands to see if the images and containers have been succesfully transferred, and Docker is able to see them at the new location.
 
--   Run `docker info` and look for the line that starts with `Docker Root Dir:`. Check if it's pointing towards the new storage location. 
+-   Run `docker info` and look for the line that starts with `Docker Root Dir:`. Check if it's pointing towards the new storage location.
 
 ## Deleting the old storage directory
 
@@ -172,7 +173,7 @@ This is a risky step in my opinion. I have the original storage directory preser
 
 # Bonus Automation!
 
-The following is a bash script that should automate this process for you while providing a way to check the time taken for each successful step. 
+The following is a bash script that should automate this process for you while providing a way to check the time taken for each successful step.
 
 ```bash
 #!/bin/bash

@@ -17,6 +17,7 @@ cover:
   hiddenInList: true
   hiddenInSingle: false
 params:
+  comments: true
   ShowCodeCopyButtons: true
   ShowReadingTime: true
 ---
@@ -52,7 +53,7 @@ In [part 2:](posts/alembic_model_expansion)
 
 ## What we'll cover
 
-In this blog post, we will cover how you can install Alembic Utils and begin incorporating entity types into the commerce data model. 
+In this blog post, we will cover how you can install Alembic Utils and begin incorporating entity types into the commerce data model.
 
 We will do the following:
 - Update the virtual environment with Alembic Utils.
@@ -63,11 +64,11 @@ We will do the following:
 
 # Installing Alembic Utils
 
-In [part 1](posts/sqlalchemy_data_modeling/#prerequisites) of this series, we created a micromamba virtual environment called `data_model` with SQLAlchemy and Alembic installed. 
+In [part 1](posts/sqlalchemy_data_modeling/#prerequisites) of this series, we created a micromamba virtual environment called `data_model` with SQLAlchemy and Alembic installed.
 
 We will activate this virtual envrionment and then install Alembic Utils.
 
-First, activate the virtual environment. 
+First, activate the virtual environment.
 
 ```bash
 micromamba activate data_model
@@ -87,58 +88,58 @@ micromamba env export > environment.yaml
 
 > [!NOTE]
 > Updating your `environment.yaml` file any time your dependencies change is good practice.
-> 
-> It makes your virtual environment reproducible and accessible! 
+>
+> It makes your virtual environment reproducible and accessible!
 
 # Adding a view to the database
 
 ## Creating a View in the ORM
 
-To explain what a view is, we can start by asking a straightforward high level question. What are the names of the products associated with a particular order? The stakeholders who have access to data might need to be able to access the products associated with a single specific order, or a group of specific orders. 
+To explain what a view is, we can start by asking a straightforward high level question. What are the names of the products associated with a particular order? The stakeholders who have access to data might need to be able to access the products associated with a single specific order, or a group of specific orders.
 
 In our database, there is a table called `order_products` that maps the associations between `orders` and `products` using the primary keys from that table. However, just looking at this table alone won't give us the contextual information we need. We will need to write an SQL query to join the `order_products` table with the `products` table in order to retrieve the name and description of a particular order's products.
 
-This is a query that can be easily **generalizable**. A query can be written to join **all** the products referenced in `order_products` with the relevant product data from `products`. This query can then be filtered to return the associations with a single order or group of orders. 
+This is a query that can be easily **generalizable**. A query can be written to join **all** the products referenced in `order_products` with the relevant product data from `products`. This query can then be filtered to return the associations with a single order or group of orders.
 
-This query can be abstracted into a view. Views are named queries that allow for data to be queried from it **like a regular table**. The view is not physically stored, however. The query in the view is run each time the view itself is referenced in a query. 
+This query can be abstracted into a view. Views are named queries that allow for data to be queried from it **like a regular table**. The view is not physically stored, however. The query in the view is run each time the view itself is referenced in a query.
 
 To return the product data associated with each `product_id` reference in `order_products`, we could write a query like this.
 
 ```sql
-select 
-  op.order_id, 
-  op.product_id, 
-  op.product_count, 
-  p.product_name, 
-  p.description, 
-  p.price 
-from 
-  order_products op 
+select
+  op.order_id,
+  op.product_id,
+  op.product_count,
+  p.product_name,
+  p.description,
+  p.price
+from
+  order_products op
   join products p on op.product_id = p.product_id
 ```
 
 We can add an adjustment to this query to return the total price of each product associated with an order when accounting for the order count.
 
 ```sql
-select 
-  op.order_id, 
-  op.product_id, 
-  op.product_count, 
-  p.product_name, 
-  p.description, 
-  p.price as unit_price, 
-  op.product_count * p.price as order_price 
-from 
-  order_products op 
+select
+  op.order_id,
+  op.product_id,
+  op.product_count,
+  p.product_name,
+  p.description,
+  p.price as unit_price,
+  op.product_count * p.price as order_price
+from
+  order_products op
   join products p on op.product_id = p.product_id
 ```
 
-We multiply the product count with the unit price to get the total cost of the product within an order. With this query, we can now filter to a specific set of `order_id` values to return all the products associated with those orders and their total cost! 
+We multiply the product count with the unit price to get the total cost of the product within an order. With this query, we can now filter to a specific set of `order_id` values to return all the products associated with those orders and their total cost!
 
-Creating a view from a query like this, that has the potential to be referenced multiple times, is great database design. We can now add this view to our ORM. 
+Creating a view from a query like this, that has the potential to be referenced multiple times, is great database design. We can now add this view to our ORM.
 
-First, we will create a script called `db_views.py` in the root of the project. This script will be where we store the views that we create for our ORM. 
- 
+First, we will create a script called `db_views.py` in the root of the project. This script will be where we store the views that we create for our ORM.
+
 `db_views.py`:
 
 ```python
@@ -148,25 +149,25 @@ order_line_items = PGView(
     schema="public",
     signature="order_line_items",
     definition="""
-select op.order_id , 
-	op.product_id, 
+select op.order_id ,
+	op.product_id,
 	op.product_count,
-	p.product_name, 
-	p.description, 
-	p.price as unit_price, 
+	p.product_name,
+	p.description,
+	p.price as unit_price,
 	op.product_count * p.price as order_price
-	from order_products op 
-join products p 
-on op.product_id = p.product_id 
+	from order_products op
+join products p
+on op.product_id = p.product_id
 """,
 )
 ```
 
-With this code, we first create a `PGView` class object called `order_line_items`. This defines a PostgreSQL view also called `order_line_items` that references the query that we wrote to return the line items (products) associated with orders. 
+With this code, we first create a `PGView` class object called `order_line_items`. This defines a PostgreSQL view also called `order_line_items` that references the query that we wrote to return the line items (products) associated with orders.
 
 ## Registering the newly defined entity
 
-We will update `alembic/env.py` to then register our newly created entity with alembic_utils. 
+We will update `alembic/env.py` to then register our newly created entity with alembic_utils.
 
 `alembic/env.py`:
 
@@ -253,7 +254,7 @@ else:
     run_migrations_online()
 ```
 
-The additions to the code import the newly defined view and register it. This view should now be detected by `alembic revision --autogenerate`. 
+The additions to the code import the newly defined view and register it. This view should now be detected by `alembic revision --autogenerate`.
 
 ## Autogenerating a migration
 
@@ -313,10 +314,10 @@ def downgrade() -> None:
     # ### end Alembic commands ###
 ```
 
-This migration script now creates a PostgreSQL view with the name `order_line_items`. 
+This migration script now creates a PostgreSQL view with the name `order_line_items`.
 
 > [!NOTE]
-> The `PGView` object here is called `public_order_line_items` as the autogenerate function uses the schema name as a prefix to the object name. In this case, the schema used is `public`. 
+> The `PGView` object here is called `public_order_line_items` as the autogenerate function uses the schema name as a prefix to the object name. In this case, the schema used is `public`.
 
 ## Applying the migration
 
@@ -326,7 +327,7 @@ We now apply the migration with the command:
 alembic upgrade head
 ```
 
-Connecting to the database shows us that the view has been migrated to the database. 
+Connecting to the database shows us that the view has been migrated to the database.
 
 {{< figure
     src="erd_diagram_view.png"
@@ -334,11 +335,11 @@ Connecting to the database shows us that the view has been migrated to the datab
     align=center
 >}}
 
-# Expanding the data model's scope 
+# Expanding the data model's scope
 
 We would like to now expand the data model to track when the attributes of a particular product have been edited. To do this, we will do the following:
 
-- Add a `last_edited` timestamp column to the `products` table. 
+- Add a `last_edited` timestamp column to the `products` table.
 - Create a function that will update the `last_edited` column of a table.
 - Create a trigger that will call the aforementioned function whenever a row of `products` is edited.
 
@@ -503,7 +504,7 @@ We will then apply this migration with the `alembic upgrade head` command.
 
 ## Creating a function to update the `last_edited` column of `products`
 
-Create a script called `db_functions.py` in the project root. 
+Create a script called `db_functions.py` in the project root.
 
 `db_functions.py`:
 
@@ -541,8 +542,8 @@ timestamp_update_apply_products_trigger = PGTrigger(
     on_entity="public.products",
     is_constraint=False,
     definition="""
-BEFORE 
-UPDATE 
+BEFORE
+UPDATE
   on products FOR EACH ROW EXECUTE FUNCTION timestamp_update_on_edit()
 """,
 )
@@ -551,15 +552,15 @@ UPDATE
 This code defines a `PGTrigger` class object with the signature `timestamp_update_apply_products_trigger`. When a row is updated on `products`, this trigger is activated and calls the `timestamp_update_on_edit()` function, which will update the `last_edited` column.
 
 >[!NOTE]
-> In the ORM, as part of the definition of the `Product` object, the `onupdate=func.now()` parameter 
-> updates the `last_edited` column when changes are issued through the ORM. 
+> In the ORM, as part of the definition of the `Product` object, the `onupdate=func.now()` parameter
+> updates the `last_edited` column when changes are issued through the ORM.
 >
-> When we create a trigger to perform the timestamp update for `products` in the database upon a row being edited, 
-> this guarantees correctness on a database level even when the changes come outside of the application. 
+> When we create a trigger to perform the timestamp update for `products` in the database upon a row being edited,
+> this guarantees correctness on a database level even when the changes come outside of the application.
 
 ## Registering the newly defined entities
 
-We will update `alembic/env.py` to then register our newly created entities with alembic_utils. 
+We will update `alembic/env.py` to then register our newly created entities with alembic_utils.
 
 `alembic/env.py`:
 
@@ -737,9 +738,9 @@ The migration script should create the function and the trigger that we defined 
 Once these changes have been migrated, run the following SQL code in the database to get the triggers associated with the `products` table.
 
 ```sql
-SELECT 
+SELECT
     tgname AS trigger_name
-FROM 
+FROM
     pg_trigger
 WHERE
     tgrelid = 'public.products'::regclass
@@ -762,9 +763,9 @@ Indicating the trigger has been successfully migrated. Run the following code to
 ```sql
 SELECT
     routine_name
-FROM 
+FROM
     information_schema.routines
-WHERE 
+WHERE
     routine_type = 'FUNCTION'
 AND
     routine_schema = 'public';
@@ -777,11 +778,11 @@ routine_name
 timestamp_update_on_edit
 ```
 
-showing that our new function has been migrated to the database as well! 
+showing that our new function has been migrated to the database as well!
 
-We've successfully added a view, a function and a trigger to our database via migrations applied from our SQLAlchemy ORM. 
+We've successfully added a view, a function and a trigger to our database via migrations applied from our SQLAlchemy ORM.
 
-Browsing through `alembic/versions` should give us an idea of the growth of our data model and how it evolves to match the change in scope of our e-commerce workflow. 
+Browsing through `alembic/versions` should give us an idea of the growth of our data model and how it evolves to match the change in scope of our e-commerce workflow.
 
 ```bash
 alembic/versions/
@@ -795,7 +796,7 @@ alembic/versions/
 
 # Next Steps
 
-In subsequent blog posts, we will cover: 
+In subsequent blog posts, we will cover:
 
 - Applying our migrations to a production environment
 - Using the ORM as a module when coding a FastAPI server

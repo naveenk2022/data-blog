@@ -9,6 +9,7 @@ draft: false
 ShowToc: true
 TocOpen: true
 params:
+  comments: true
   ShowCodeCopyButtons: true
   ShowReadingTime: true
 ---

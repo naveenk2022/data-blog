@@ -19,6 +19,7 @@ cover:
   hiddenInList: true
   hiddenInSingle: false
 params:
+  comments: true
   ShowCodeCopyButtons: true
   ShowReadingTime: true
 ---
@@ -43,9 +44,9 @@ SLURM is uniquely suited for use in HPC clusters, due to its ability to facilita
 SLURM places jobs/tasks in a queue, and access to resources is allowed based on the processes that are already running at the time, which is very well suited for an HPC cluster, where resources are under heavy usage.
 
 
-{{< figure 
-  src="slurm-diag.png" 
-  attr="SLURM architecture. Slurm has a centralized manager, slurmctld, to monitor resources and work. Each compute server (node) has a slurmd daemon, which can be compared to a remote shell: it waits for work, executes that work, returns status, and waits for more work." 
+{{< figure
+  src="slurm-diag.png"
+  attr="SLURM architecture. Slurm has a centralized manager, slurmctld, to monitor resources and work. Each compute server (node) has a slurmd daemon, which can be compared to a remote shell: it waits for work, executes that work, returns status, and waits for more work."
   align=center
 >}}
 
@@ -83,7 +84,7 @@ SLURM uses an environmental variable that is unique for each task in the array. 
 
 The following is an example of a simple SLURM script. A folder named `text_files` was created, and that contained text files in the format chr{x}.txt, where x could be from 1 to 22, as well as X, Y and M. The purpose of this script is to read the absolute location of each text file, and print that in an output file called `output.txt`.
 
-```bash         
+```bash
 #!/bin/bash
 #SBATCH --mail-user=XXX@gmail.com
 #SBATCH --mail-type=ALL

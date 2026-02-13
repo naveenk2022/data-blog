@@ -12,11 +12,12 @@ cover:
   image: "dnsmasq_icon.png"
   alt: "<alt text>"
   caption: "The dnsmasq logo."
-  relative: false 
+  relative: false
   hidden: false
   hiddenInList: true
   hiddenInSingle: false
 params:
+  comments: true
   ShowCodeCopyButtons: true
   ShowReadingTime: true
 ---
@@ -25,7 +26,7 @@ params:
 
 **What is a PXE boot server?**
 
-The term PXE stands for **P**reboot E**x**ecution **E**nvironment. This environment consists of a server which serves multiple clients. The server hosts software images, and the clients it serves are able to boot these images by retrieving them from the server via the network. 
+The term PXE stands for **P**reboot E**x**ecution **E**nvironment. This environment consists of a server which serves multiple clients. The server hosts software images, and the clients it serves are able to boot these images by retrieving them from the server via the network.
 
 Essentially, this allows for the clients to boot over the network, instead of from physical media such as a CD-ROM or hard disk, *provided they are PXE boot capable.* This typically includes BIOS and UEFI PCs.
 
@@ -33,7 +34,7 @@ Essentially, this allows for the clients to boot over the network, instead of fr
 
 The PXE boot process relies on a lot of standard Internet protocols, and these include the following:
 
-- **DHCP** (Dynamic Host Configuration Protocol):  A client-server based network management protocol used on IPv4 and IPv6 networks to automatically assign IP addresses to devices within the network, ensuring that no two devices share the same IP address. 
+- **DHCP** (Dynamic Host Configuration Protocol):  A client-server based network management protocol used on IPv4 and IPv6 networks to automatically assign IP addresses to devices within the network, ensuring that no two devices share the same IP address.
 
 - **TFTP** (Trivial File Transfer Protocol):  A simple client-server based file transfer protocol.
 
@@ -41,11 +42,11 @@ The PXE boot process relies on a lot of standard Internet protocols, and these i
 
 - **HTTP** (Hypertext Transfer Protocol): In the PXE boot process, HTTP can be used by the PXE server to deliver OS images and other necessary files to the client machine over the network. Serving these files over HTTP can offer advantages such as higher transfer speeds and better reliability compared to TFTP.
 
-The PXE server will serve the OS to it's client node through a combination of these network protocols. 
+The PXE server will serve the OS to it's client node through a combination of these network protocols.
 
 ## Network Architecture
 
-{{< figure 
+{{< figure
     src="pxe_arch.png"
     caption="A basic example of the network architecture of a PXE environment. The PXE server is a part of the local network to which it serves OS images."
     align=center
@@ -59,7 +60,7 @@ The PXE server is typically located on the same local network as the clients it 
 
 ### DHCP Request and IP Assignment
 
-When a client initiates a PXE boot, it sends out a DHCP request to obtain an IP address and other network configuration details. The PXE server, which often also functions as a DHCP server or works in conjunction with one, responds to this request, assigning a local IP address to the client from a predefined range. This local IP address is part of the same subnet as the PXE server. 
+When a client initiates a PXE boot, it sends out a DHCP request to obtain an IP address and other network configuration details. The PXE server, which often also functions as a DHCP server or works in conjunction with one, responds to this request, assigning a local IP address to the client from a predefined range. This local IP address is part of the same subnet as the PXE server.
 
 ### DHCP Reservation
 
@@ -72,6 +73,3 @@ Additionally, the PXE server can serve different images based on the MAC address
 Once the IP address is assigned, the PXE server can serve the necessary boot files to the client. This usually includes a network boot program (NBP) and an operating system image. The server may use TFTP for the initial stages of the boot process due to its simplicity and ease of implementation. However, for larger files, more efficient protocols like HTTP or NFS can be used to improve transfer speeds and reliability.
 
 This local network setup allows the PXE server to handle multiple client requests simultaneously, while also managing IP address allocation. It also simplifies network management, as all devices are within the same local network, reducing the complexity associated with routing and firewall configurations that might be required if the PXE server and clients were on different networks.
-
-
-

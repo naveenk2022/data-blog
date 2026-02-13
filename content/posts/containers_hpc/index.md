@@ -12,11 +12,12 @@ cover:
   image: "gdep_dockermodel.jpg"
   alt: "<alt text>"
   caption: "<text>"
-  relative: false 
+  relative: false
   hidden: false
   hiddenInList: true
   hiddenInSingle: false
 params:
+  comments: true
   ShowCodeCopyButtons: true
   ShowReadingTime: true
 ---
@@ -27,9 +28,9 @@ Containers are environments that are intended to be lightweight and standalone s
 
 Containers *share* the host OS's kernel and do not require an OS per application, which is a key difference between containers and virtual machines, which otherwise share a lot of similarities.
 
-{{< figure 
-    src="docker_architecture.png" 
-    caption="A very basic overview of container architecture." 
+{{< figure
+    src="docker_architecture.png"
+    caption="A very basic overview of container architecture."
     align=center
 >}}
 
@@ -51,17 +52,17 @@ In this post, I will be going over two common platforms that can be used to run 
 
 Containers and the changes made to the container do not persist after the container instance is killed.
 
-{{< figure 
-    src="cat_bubble.jpg" 
-    caption="Think of containers as a bubble. Once they pop, its like they were never there at all!" 
+{{< figure
+    src="cat_bubble.jpg"
+    caption="Think of containers as a bubble. Once they pop, its like they were never there at all!"
     align=center
 >}}
 
 It is possible to "mount" data directories on the host machine into the container instance, allowing for the changes made to the host system directory to persist after the container instance is killed.
 
-{{< figure 
-    src="container_mounting.png" 
-    caption="Mounting a directory allows for the changes made by the container within the directory to persist after the container is killed." 
+{{< figure
+    src="container_mounting.png"
+    caption="Mounting a directory allows for the changes made by the container within the directory to persist after the container is killed."
     align=center
 >}}
 
@@ -75,8 +76,8 @@ Think of images as the template from which containers are run.
 
 A container is a running instance of an image, and they are isolated from the host system.
 
-{{< figure 
-    src="container_lingo.png" 
+{{< figure
+    src="container_lingo.png"
     align=center
 >}}
 
@@ -84,8 +85,8 @@ A container is a running instance of an image, and they are isolated from the ho
 
 Docker is an open platform that allows for separation of development tools and processes from your native infrastructure. It provides the ability to run processes in an semi-isolated environment called a **container**.
 
-{{< figure 
-    src="docker_logo.jpg" 
+{{< figure
+    src="docker_logo.jpg"
     caption="The Docker Logo."
     align=center
 >}}
@@ -109,8 +110,8 @@ Docker Containers are built from Docker images, which are compiled from dockerfi
 
 Singularity is an open source tool that was created to run complex applications specifically on HPC clusters.
 
-{{< figure 
-    src="singularity_logo.png" 
+{{< figure
+    src="singularity_logo.png"
     caption="The Singularity Logo."
     align=center
 >}}

@@ -3,7 +3,6 @@ languageCode: en-us
 title: Naveen Kannan
 theme: ["hugo-admonitions", "hugo-PaperMod"]
 params:
-  comments: true
   profileMode:
     enabled: true
     title: "Database Engineer"
