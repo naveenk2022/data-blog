@@ -11,6 +11,7 @@ params:
     imageWidth: 196 # custom size
     imageHeight: 313 # custom size
   ShowReadingTime: true
+  comments: true
 
   socialIcons: # optional
     - name: github
