@@ -1,11 +1,11 @@
 ---
 title: "Private Intranet SSL certificate generation using DNS-01 challenges."
-date: "2026-02-16"
+date: "2026-02-17"
 tags: ['SSL', 'TLS', 'HTTPS', 'Self-Hosting', 'Intranet', 'CRON', 'DNS-01', 'Tutorial']
 description: "Using a command-line based ACME client to automate the generation of SSL certificates for intranet servers."
 author: ["Naveen Kannan"]
 weight: 10
-draft: true
+draft: false
 ShowToc: true
 TocOpen: true
 cover:
