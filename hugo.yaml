@@ -11,12 +11,15 @@ params:
     imageWidth: 196 # custom size
     imageHeight: 313 # custom size
   ShowReadingTime: true
+  ShowFullTextinRSS: true
 
   socialIcons: # optional
     - name: github
       url: "https://github.com/naveenk2022"
     - name: linkedin
       url: "https://www.linkedin.com/in/naveenkannan1/"
+    - name: rss
+      url: "https://naveenkannan.dev/index.xml" # Your RSS feed url path
   assets:
     favicon: "assets/favicon.svg"
     favicon16x16: "assets/favicon.svg"

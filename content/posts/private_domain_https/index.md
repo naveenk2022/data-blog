@@ -78,14 +78,6 @@ In this blog post, I will demonstrate how you can set this up and then automate 
 
 First, let's go over some basic fundamentals.
 
-> [!NOTE]
-> The inspiration and guide for this blog post is this [blog post by Benjamin Bryan](https://b3n.org/intranet-ssl-certificates-using-lets-encrypt-dns-01/) that was published on September 12, 2016.
-> Ben's [blog is excellent](https://b3n.org/) and he writes on a lot of interesting topics.
->
-> I highly recommend that you go check out his [original blog post,](https://b3n.org/intranet-ssl-certificates-using-lets-encrypt-dns-01/) which is what I followed while setting up the scripts and automations that I discuss in this blog.
->
->This post would have been impossible without the original subject matter as a guide!
-
 ## Let's Encrypt and the ACME protocol
 
 {{< figure
@@ -120,7 +112,65 @@ Lightweight (it's pretty much a bash script!) and simple with an MIT license, th
 
 ## ACME Challenges
 
-When requesting a signed certificate from Let's Encrypt via an ACME client, Let's Encrypt vlidates that you control the domain name by issues **challenges** defined by the ACME standard.
+When requesting a signed certificate from Let's Encrypt via an ACME client, Let's Encrypt vlidates that you control the domain name by issuing **challenges** defined by the ACME standard. There are three types of challenges, HTTP-01, DNS-01 and TLS-ALPN-01.
+
+TLS-ALPN-01 is highly technical and uses a custom ALPN protocol, and isn't very relevant for this post, so we won't go over it this time.
+
+### HTTP-01
+
+This is the most common challenge type, where the client proves control over a domain name by proving that it can provision HTTP resouces on a server accessible under that domain name.
+
+This challenge type requires the creation of A/AAAA records with your DNS provider. During the challenge process, Let's Encrypt servers will connect to at least one of the hosts found in the DNS A and AAAA records. For this challenge to successfully validate, the server must be reachable at the specified IP address.
+
+This is why we won't be going with HTTP-01 challenges in this blog post, since that would defeat the purpose of having a private intranet to begin with.
+
+>[!NOTE]
+> DNS `A` records indicate the IP address of a given domain name, in the IPv4 format.
+> DNS `AAAA` records indicate the IP address of a given domain name in the IPv6 format.
+
+### DNS-01
+
+DNS-01 challenges require the client to provision a `TXT` containing a designated value for a specific validation domain name.
+
+After Let's Encrypt issues the ACME client a token as part of valdiation, the client will create a `TXT` record with your DNS procider derived from that token and account key. Let's Encrypt will then query the DNS system for that record, and will then issue a certificate if it finds a match.
+
+This is the challenge type we will be using in this blog post, since this approach **does not** require us to expose the servers to the public internet. However, this approach requires that your DNS provider has API functionality to automate this process.
+
+>[!NOTE]
+> DNS `TXT` records store text information often used for verification.
+
+# Prerequisites
+
+With a brief explanation of the fundamentals completed, let's move forward with the prerequisites you will need before following along with this post.
+
+You will need:
+
+- A DNS provider with API functionality.
+
+>[!TIP]
+>While it is possible to manually update `TXT` records every 60-90 days, that approach is highly discouraged. ACME was built on the principle of automation,
+> so if your DNS provider does not have API functionality, I highly recommend that you swap to a DNS provider that supports an API.
+>
+> The Let's Encrypt community has created a [resource to track DNS providers who provide API support](https://community.letsencrypt.org/t/dns-providers-who-easily-integrate-with-lets-encrypt-dns-validation/86438), which is a very useful resource.
+
+- Your DNS server (different from your DNS provider) maps the IP address of your private server to the domain name you intend to use.
+
+- cURL, sed, grep, awk, mktemp and `openssl` on your Unix OS.
+
+## Installing the `dehydrated` client
+
+The [`dehydrated`](https://github.com/dehydrated-io/dehydrated) ACME client can be installed as follows:
+
+```bash
+sudo su
+# Downloading the Dehydrated client
+cd /opt
+git clone https://github.com/lukas2511/dehydrated.git
+
+# Creating the necessary folders
+cd dehydrated
+mkdir certs accounts hooks
+```
 
 # Citations
 
@@ -138,6 +188,8 @@ When requesting a signed certificate from Let's Encrypt via an ACME client, Let'
 
 - The [Let's Encrypt Website.]()
 - Let's Encrypt's [documentation on Challenge Types.](https://letsencrypt.org/docs/challenge-types/)
+- [RFC8555 documentation on DNS-01 challenges.](https://datatracker.ietf.org/doc/html/rfc8555#section-8.4)
+- [RFC855 documentation on HTTPS-01 challenges.](https://datatracker.ietf.org/doc/html/rfc8555#section-8.3)
 - Let's Encrypt's [documentation on recommended ACME clients.](https://letsencrypt.org/docs/client-options/)
 - The [ACME protocol on Wikipedia.](https://en.wikipedia.org/wiki/Automatic_Certificate_Management_Environment)
 - The [dehydrated ACME client.](https://github.com/dehydrated-io/dehydrated)
