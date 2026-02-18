@@ -11,7 +11,7 @@ TocOpen: true
 cover:
   image: "https://letsencrypt.org/images/letsencrypt-logo-horizontal.svg"
   alt: "<alt text>"
-  caption: "The Let's Encrypt logo."
+  caption: "Let's Encrypt's logo."
   relative: false
   hidden: false
   hiddenInList: true
