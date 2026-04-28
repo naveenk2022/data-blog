@@ -5,7 +5,7 @@ theme: ["hugo-admonitions", "hugo-PaperMod"]
 params:
   profileMode:
     enabled: true
-    title: "Database Engineer"
+    title: "Data Engineer"
     imageUrl: "/images/avatar.png" # optional
     imageTitle: "The Tri-Angled Truth"
     imageWidth: 196 # custom size
