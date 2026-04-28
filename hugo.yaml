@@ -2,6 +2,7 @@ baseURL: https://naveenkannan.dev
 languageCode: en-us
 title: Naveen Kannan
 theme: ["hugo-admonitions", "hugo-PaperMod"]
+pagination.pagerSize: 5 
 params:
   profileMode:
     enabled: true
@@ -12,6 +13,8 @@ params:
     imageHeight: 313 # custom size
   ShowReadingTime: true
   ShowFullTextinRSS: true
+  ShowAllPagesInArchive: true 
+  description: "A data engineering blog dedicated to documenting powerful yet simple data engineering tips and tricks, discovered through real world experience."
 
   socialIcons: # optional
     - name: github
