@@ -9,8 +9,8 @@ params:
     title: "Data Engineer"
     imageUrl: "/images/avatar.png" # optional
     imageTitle: "The Tri-Angled Truth"
-    imageWidth: 196 # custom size
-    imageHeight: 313 # custom size
+    imageWidth: 294 # custom size
+    imageHeight: 470 # custom size
   ShowReadingTime: true
   ShowFullTextinRSS: true
   ShowAllPagesInArchive: true 
