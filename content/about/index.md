@@ -4,16 +4,16 @@ draft: false
 ShowReadingTime: false
 ---
 
-I'm a Database Engineer at [Trailhead Biosystems, Cleveland](https://www.trailbio.com). In my spare time I enjoy painting miniatures, swimming, hiking and cooking.
+I'm a Data Engineer by trade. In my spare time I enjoy painting miniatures, swimming, hiking and cooking.
 
 This is my personal little nerd cave. I like to share some of the cool stuff I work on via my blog. I hope you find something useful here!
 
 
 ## Education
 
-**MS in Biomedical and Health Informatics**
+**MSc in Biomedical and Health Informatics**
 
-Case Western Reserve University \| Cleveland - Ohio
+Case Western Reserve University \| Cleveland, Ohio
 
 January 2022 - August 2023
 
@@ -27,11 +27,19 @@ September 2016 - March 2020
 
 ## Experience
 
+**Intermediate Data Engineer**
+
+Progressive Insurance, Mayfield Village, Ohio
+
+May 2026 - Present
+
+------------------------------------------------------------------------
+
 **Database Engineer**
 
 Trailhead Biosystems, Cleveland, Ohio
 
-July 2024 - Present
+July 2024 - April 2026
 
 ------------------------------------------------------------------------
 
