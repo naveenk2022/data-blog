@@ -16,7 +16,7 @@ cover:
   caption: "<text>"
   relative: false # To use relative path for cover image, used in hugo Page-bundles
   hidden: false
-  hiddenInList: true
+  hiddenInList: false
   hiddenInSingle: false
 params:
   comments: true

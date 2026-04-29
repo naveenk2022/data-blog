@@ -1,5 +1,5 @@
 baseURL: https://naveenkannan.dev
-languageCode: en-us
+locale: en-us
 title: Naveen Kannan
 theme: ["hugo-admonitions", "hugo-PaperMod"]
 pagination:
@@ -42,7 +42,7 @@ params:
     safari_pinned_tab: "assets/favicon.svg"
 languages:
   en:
-    languageName: "English"
+    label: "English"
     weight: 1
     taxonomies:
       category: categories
