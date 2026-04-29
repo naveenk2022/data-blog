@@ -14,7 +14,6 @@ params:
     imageTitle: "The Tri-Angled Truth"
     imageWidth: 294 # custom size
     imageHeight: 470 # custom size
-  images: ["images/avatar.png"] 
   ShowReadingTime: true
   ShowFullTextinRSS: true
   ShowAllPagesInArchive: true 
