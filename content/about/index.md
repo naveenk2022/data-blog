@@ -73,3 +73,9 @@ Madras Medical College, Chennai, India
 
 March 2019 - March 2020
 
+{{< figure
+    src="../images/avatar.png"
+    caption="The tri-angled truth."
+    link="https://en.uesp.net/wiki/Lore:CHIM"
+    align=center
+>}}

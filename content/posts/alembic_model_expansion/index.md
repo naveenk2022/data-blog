@@ -14,7 +14,7 @@ cover:
   caption: "The SQLAlchemy logo."
   relative: false
   hidden: false
-  hiddenInList: true
+  hiddenInList: false
   hiddenInSingle: false
 params:
   comments: true

@@ -2,20 +2,32 @@ baseURL: https://naveenkannan.dev
 languageCode: en-us
 title: Naveen Kannan
 theme: ["hugo-admonitions", "hugo-PaperMod"]
-pagination.pagerSize: 5 
+pagination:
+  disableAliases: false
+  pagerSize: 5
+  path: page
 params:
   profileMode:
-    enabled: true
+    enabled: false
     title: "Data Engineer"
     imageUrl: "/images/avatar.png" # optional
     imageTitle: "The Tri-Angled Truth"
     imageWidth: 294 # custom size
     imageHeight: 470 # custom size
+  images: ["images/avatar.png"] 
   ShowReadingTime: true
   ShowFullTextinRSS: true
   ShowAllPagesInArchive: true 
+  ShowPageNums: true
   description: "A data engineering blog dedicated to documenting powerful yet simple data engineering tips and tricks, discovered through real world experience."
-
+  homeInfoParams:  
+    Title: "Welcome to my blog!"  
+    Content: >
+      This is my personal little nerd cave. 
+      
+      I like to share some of the cool stuff I work on via my blog. 
+      
+      I hope you find something useful here!
   socialIcons: # optional
     - name: github
       url: "https://github.com/naveenk2022"
@@ -39,7 +51,7 @@ languages:
       series: series
     menu:
       main:
-        - name: Posts
+        - name: Archive
           url: archives/
           weight: 10
         - name: Publications
