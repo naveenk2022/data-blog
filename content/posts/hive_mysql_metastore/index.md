@@ -14,7 +14,7 @@ cover:
   caption: "<text>"
   relative: false
   hidden: false
-  hiddenInList: true
+  hiddenInList: false
   hiddenInSingle: false
 params:
   comments: true
