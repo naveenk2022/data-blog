@@ -8,6 +8,7 @@ weight: 10
 draft: false
 ShowToc: true
 TocOpen: true
+series: ["Data Modeling with SQLAlchemy and Alembic"]
 cover:
   image: "https://www.sqlalchemy.org/img/sqla_logo.png"
   alt: "<alt text>"
