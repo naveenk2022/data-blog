@@ -1,0 +1,13 @@
+.notice--info {
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    border-left: 0.5em solid #8ebeeb;
+}
+
+.notice--info > *:first-child {
+    margin-top: 0;
+}
+
+.notice--info > *:last-child {
+    margin-bottom: 0;
+}
