@@ -2,10 +2,10 @@
 title: "Configuring FastAPI for use with PowerBI when using Entra ID for OAuth2."
 date: "2026-07-26"
 tags: ['Python', 'FastAPI', 'Entra ID', 'PowerBI', 'OAuth2', 'Tutorial']
-description: "A guide to enabling a FastAPI instance integrated with Entra ID for OAuth2 to be accessible via PowerBI."
+description: "A guide to enabling a FastAPI integrated with Entra ID to be accessible via PowerBI."
 author: ["Naveen Kannan"]
 weight: 10
-draft: true
+draft: false
 ShowToc: true
 TocOpen: true
 cover:
